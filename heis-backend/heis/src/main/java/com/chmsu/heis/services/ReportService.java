@@ -1,9 +1,11 @@
 package com.chmsu.heis.services;
 
 
+import com.chmsu.heis.model.document.ExternalReports;
 import com.chmsu.heis.model.document.MonthlyReports;
 import com.chmsu.heis.model.document.Reports;
 import com.chmsu.heis.model.document.UserDetailsForMonthlyReports;
+import com.chmsu.heis.repository.ExternalReportsRepository;
 import com.chmsu.heis.repository.MonthlyReportsRepository;
 import com.chmsu.heis.repository.ReportsRepository;
 import com.chmsu.heis.repository.UserDetailsForMonthlyReportsRepository;
@@ -24,6 +26,8 @@ public class ReportService {
     @Autowired
     private MonthlyReportsRepository monthlyReportsRepository;
     @Autowired
+    private ExternalReportsRepository externalReportsRepository;
+    @Autowired
     private UserDetailsForMonthlyReportsRepository userDetailsForMonthlyReportsRepository;
 
 
@@ -42,10 +46,10 @@ public class ReportService {
         }
     }
 
-    public List<MonthlyReports> getExternalMonthlyReports(String externalMonth){
+    public List<ExternalReports> getExternalMonthlyReports(String externalMonth, String externalYear){
         try{
             System.out.println(externalMonth);
-            return monthlyReportsRepository.monthlyReportExternal(externalMonth);
+            return externalReportsRepository.monthlyReportExternal(externalMonth,externalYear);
         }catch (Exception e){
             throw new RuntimeException("System encountered an exception",e);
         }

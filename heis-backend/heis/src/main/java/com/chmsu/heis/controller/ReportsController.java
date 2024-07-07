@@ -1,6 +1,7 @@
 package com.chmsu.heis.controller;
 
 
+import com.chmsu.heis.model.document.ExternalReports;
 import com.chmsu.heis.model.document.MonthlyReports;
 import com.chmsu.heis.model.document.Reports;
 import com.chmsu.heis.model.document.UserDetailsForMonthlyReports;
@@ -41,10 +42,10 @@ public class ReportsController {
         return ResponseEntity.ok(monthlyReports);
     }
 
-    @GetMapping("external/{external}")
-    public ResponseEntity<List<MonthlyReports>> externalReports(@PathVariable("external") String externalMonth){
-        System.out.println(externalMonth);
-        List<MonthlyReports> externalMonthlyReports = reportService.getExternalMonthlyReports(externalMonth);
+    @GetMapping("external/{month}/{year}")
+    public ResponseEntity<List<ExternalReports>> externalReports(@PathVariable("month") String month,@PathVariable("year")String year){
+        System.out.println(month);
+        List<ExternalReports> externalMonthlyReports = reportService.getExternalMonthlyReports(month,year);
         return ResponseEntity.ok(externalMonthlyReports);
     }
 

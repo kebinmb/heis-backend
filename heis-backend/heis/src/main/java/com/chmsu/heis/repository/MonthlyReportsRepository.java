@@ -22,15 +22,7 @@ public interface MonthlyReportsRepository extends JpaRepository<MonthlyReports,L
                                        @Param("year")String year);
 
 
-   @Query(value = "SELECT document.document_id,document.from,user.name,document.department_id,COUNT(document.document_id) AS doc_count\n" +
-           "FROM document\n" +
-           "INNER JOIN user ON user.user_id = document.from\n" +
-           "INNER JOIN department ON department.department_id = user.department_id\n" +
-           "WHERE YEAR(document.timestamp) = YEAR(CURRENT_DATE())\n" +
-           "  AND MONTH(document.timestamp) = :month\n" +
-           "  AND user.user_type = 2\n" +
-           "GROUP BY document.document_id;\n",nativeQuery = true)
-    List<MonthlyReports> monthlyReportExternal(@Param("month") String month);
+
 
 
 }
