@@ -19,13 +19,17 @@ public interface EmailRepository extends JpaRepository<Email,Long>
                    @Param("dateOfLetter") String dateOfLetter,
                    @Param("type") Integer type,
                    @Param("attention") String attention,
-                   @Param("through") Integer through,
-                   @Param("from") Integer from,
+                   @Param("through") String through,
+                   @Param("from") String from,
                    @Param("pageCount") Integer pageCount,
                    @Param("attachment") String attachment,
                    @Param("campus") Integer campus,
                    @Param("departmentId") Integer departmentId,
-                   @Param("cc") String[] cc,
+                   @Param("cc") String cc,
                    @Param("encoder") Integer encoder);
+
+    @Query(value="SELECT MAX(document_number) + 1 AS next_document_number\n" +
+            "FROM document;",nativeQuery = true)
+    Integer documentNumber();
 }
 //Method for sending logs

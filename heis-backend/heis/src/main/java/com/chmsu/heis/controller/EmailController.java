@@ -21,13 +21,8 @@ public class EmailController {
         emailService.sendEmail(email);
     }
 
-    @PostMapping("/{id}")
-    public Email getEmailById(@PathVariable Long id) {
-        return emailService.getEmailById(id);
-    }
-
-    @GetMapping
-    public List<Email> getAllEmails() {
-        return emailService.getAllEmails();
+    @GetMapping("/docnum")
+    public Integer getDocumentNumber(){
+        return emailService.documentNumberCount();
     }
 }
