@@ -14,6 +14,8 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.sql.Date;
+import java.text.SimpleDateFormat;
 import java.util.List;
 @Service
 public class EmailService {
@@ -71,11 +73,12 @@ public class EmailService {
 
         mailSender.send(mimeMessage);
 
-
+        String formattedDate = formatDate(email.getDateOfLetter());
+        System.out.println(formattedDate);
         emailRepository.saveEmail(
                 email.getDocumentNumber(),
                 email.getSubject(),
-                email.getDateOfLetter(),
+                formattedDate,
                 email.getType(),
                 email.getAttention(),
                 email.getThrough(),
@@ -85,6 +88,10 @@ public class EmailService {
                 email.getDepartmentId(),
                 ccJson,
                 email.getEncoder());
+    }
+    private String formatDate(Date date) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        return dateFormat.format(date);
     }
     public Integer documentNumberCount(){
         return emailRepository.documentNumber();

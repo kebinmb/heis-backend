@@ -6,6 +6,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 
+import java.sql.Date;
 import java.util.List;
 
 @Entity
@@ -15,7 +16,7 @@ public class Email {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer documentNumber;
     private String subject;
-    private String dateOfLetter;
+    private Date dateOfLetter;
     private Integer type;
     private String attention;//to
     private String through;
