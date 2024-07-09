@@ -2,6 +2,7 @@ package com.chmsu.heis.services;
 
 import com.chmsu.heis.model.document.Email;
 import com.chmsu.heis.repository.EmailRepository;
+import com.chmsu.heis.repository.LogsRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.mail.MessagingException;
@@ -19,12 +20,14 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 @Service
 public class EmailService {
-
     @Autowired
     private JavaMailSender mailSender;
 
     @Autowired
     private EmailRepository emailRepository;
+
+    @Autowired
+    private LogsRepository logsRepository;
 
     @Value("${spring.mail.username}")
     private String from;
@@ -32,49 +35,53 @@ public class EmailService {
     public void sendEmail(Email email) throws MessagingException {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true);
+        String htmlContent = "<html><body>" +
+                "<h2>Records Management System</h2>" +
+                "<pre>" + email.getMessage() + "</pre>" +  // Preserve formatting with <pre> tag
+                "</body></html>";
 
-        mimeMessage.setContent(email.getMessage(), "text/html; charset=UTF-8");
+        // Set basic email attributes
+        helper.setFrom(from);
+        helper.setTo(email.getAttention());
+        helper.setSubject(email.getSubject());
+        helper.setText(htmlContent,true);
 
-        //CC to JSON
+        // Process CC addresses
         ObjectMapper objectMapper = new ObjectMapper();
         String ccJson;
         try {
             ccJson = objectMapper.writeValueAsString(email.getCc());
         } catch (JsonProcessingException e) {
             e.printStackTrace();
-            // Handle the error appropriately
-            throw new RuntimeException("Failed to convert cc list to JSON", e);
+            throw new RuntimeException("Failed to convert CC list to JSON", e);
         }
 
-        helper.setFrom(from);
-        helper.setTo(email.getAttention());
-
-        //CC to String[]
         String[] ccArray;
         try {
             ccArray = objectMapper.readValue(ccJson, String[].class);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
-            // Handle the error appropriately
-            throw new RuntimeException("Failed to convert JSON to cc array", e);
+            throw new RuntimeException("Failed to convert JSON to CC array", e);
         }
 
         helper.setCc(ccArray);
 
-        helper.setSubject(email.getSubject());
-        helper.setText(email.getMessage(), true);
-        if (email.getAttachment() != null) {
-            FileSystemResource file = new FileSystemResource(new File(email.getAttachment()));
-            helper.addAttachment("Attachment", file);
-        }
-        else{
-            email.setAttachment(null);
+        // Attach the file if present
+        if (email.getAttachment() != null && !email.getAttachment().isEmpty()) {
+            File file = new File(email.getAttachment());
+            if (file.exists() && file.isFile()) {
+                FileSystemResource fileResource = new FileSystemResource(file);
+                helper.addAttachment(fileResource.getFilename(), fileResource);
+            } else {
+                System.out.println("Attachment file is not found");
+            }
         }
 
+        // Send the email
         mailSender.send(mimeMessage);
 
+        // Save the email details to the repository
         String formattedDate = formatDate(email.getDateOfLetter());
-        System.out.println(formattedDate);
         emailRepository.saveEmail(
                 email.getDocumentNumber(),
                 email.getSubject(),
@@ -84,18 +91,24 @@ public class EmailService {
                 email.getThrough(),
                 email.getFrom(),
                 email.getPageCount(),
-                email.getAttachment(),email.getCampus(),
+                email.getAttachment(),
+                email.getCampus(),
                 email.getDepartmentId(),
                 ccJson,
-                email.getEncoder());
+                email.getEncoder(),
+                email.getMessage());
+        logsRepository.insertLogs(email.getEncoder(),email.getMessage(),email.getDateOfLetter());
     }
-    private String formatDate(Date date) {
+
+    private String formatDate(java.sql.Date dateOfLetter) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        return dateFormat.format(date);
+        return dateFormat.format(dateOfLetter);
     }
-    public Integer documentNumberCount(){
+
+    public Integer documentNumberCount() {
         return emailRepository.documentNumber();
     }
+
     public Email getEmailById(Long id) {
         return emailRepository.findById(id).orElse(null);
     }

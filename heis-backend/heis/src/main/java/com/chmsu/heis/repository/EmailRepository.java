@@ -13,7 +13,7 @@ public interface EmailRepository extends JpaRepository<Email,Long>
 {
     @Modifying
     @Transactional
-    @Query(value = "INSERT INTO document (document_number, subject, date_of_letter, type, attention, through, `from`, page_count, attachment, campus, department_id, cc, encoder) VALUES (:documentNumber, :subject, :dateOfLetter, :type, :attention, :through, :from, :pageCount, :attachment, :campus, :departmentId, :cc, :encoder)", nativeQuery = true)
+    @Query(value = "INSERT INTO document (document_number, subject, date_of_letter, type, attention, through, `from`, page_count, attachment, campus, department_id, cc, encoder,message) VALUES (:documentNumber, :subject, :dateOfLetter, :type, :attention, :through, :from, :pageCount, :attachment, :campus, :departmentId, :cc, :encoder,:message)", nativeQuery = true)
     void saveEmail(@Param("documentNumber") Integer documentNumber,
                    @Param("subject") String subject,
                    @Param("dateOfLetter") String dateOfLetter,
@@ -26,7 +26,8 @@ public interface EmailRepository extends JpaRepository<Email,Long>
                    @Param("campus") Integer campus,
                    @Param("departmentId") Integer departmentId,
                    @Param("cc") String cc,
-                   @Param("encoder") Integer encoder);
+                   @Param("encoder") Integer encoder,
+                   @Param("message") String message);
 
     @Query(value="SELECT MAX(document_number) + 1 AS next_document_number\n" +
             "FROM document;",nativeQuery = true)

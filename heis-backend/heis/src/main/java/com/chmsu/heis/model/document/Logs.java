@@ -16,7 +16,7 @@ public class Logs {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long logId;
+//    private Long logId;
 
     private Long userId;
     private String message;
