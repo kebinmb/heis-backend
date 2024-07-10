@@ -32,5 +32,8 @@ public interface EmailRepository extends JpaRepository<Email,Long>
     @Query(value="SELECT MAX(document_number) + 1 AS next_document_number\n" +
             "FROM document;",nativeQuery = true)
     Integer documentNumber();
+
+    @Query(value="SELECT email FROM user WHERE name = :name",nativeQuery = true)
+    String getEmail(String name);
 }
 //Method for sending logs

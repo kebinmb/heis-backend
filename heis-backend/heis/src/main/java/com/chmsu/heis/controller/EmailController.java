@@ -105,4 +105,10 @@ public class EmailController {
     public Integer getDocumentNumber(){
         return emailService.documentNumberCount();
     }
+
+    @GetMapping("/specificemail")
+    public ResponseEntity<String> getEmailAddress(@RequestParam("name") String name){
+    String emailAddress = emailService.getEmail(name);
+    return ResponseEntity.ok(emailAddress);
+    }
 }

@@ -127,4 +127,10 @@ public class UserController {
             return ResponseEntity.status(401).body("Invalid credentials or insufficient access level");
         }
     }
+
+    @GetMapping("/users")
+    public ResponseEntity<List<User>> getAllUser(){
+        List<User> allUsers = userService.getAllUser();
+        return ResponseEntity.ok(allUsers);
+    }
 }

@@ -109,6 +109,9 @@ public class EmailService {
         return emailRepository.documentNumber();
     }
 
+    public String getEmail(String name){
+        return emailRepository.getEmail(name);
+    }
     public Email getEmailById(Long id) {
         return emailRepository.findById(id).orElse(null);
     }

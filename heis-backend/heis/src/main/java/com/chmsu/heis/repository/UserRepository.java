@@ -44,6 +44,10 @@ public interface UserRepository extends JpaRepository<User,Long> {
     @Query(value="SELECT email FROM user where employee_type='staff' AND designation = 'Job Order'",nativeQuery = true)
     List<String> getJobOrderStaffEmails();
 
+    //Get all user info
+    @Query(value="SELECT * FROM user",nativeQuery = true)
+    List<User> getAllUser();
+
     @Query("SELECT u FROM User u WHERE u.username = :username AND u.password = :password AND u.accessLevel IN (:accessLevels)")
     User findByUsernameAndPasswordAndAccessLevel(@Param("username") String username,
                                                  @Param("password") String password,

@@ -84,4 +84,7 @@ public class UserService {
         return userRepository.findByUsernameAndPasswordAndAccessLevel(username, password, accessLevels);
     }
 
+    public List<User> getAllUser(){
+        return userRepository.getAllUser();
+    }
 }
