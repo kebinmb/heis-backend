@@ -17,16 +17,16 @@ public class DocumentGroup {
     private Integer documentNumber;
     private String subject;
     private Date dateOfLetter;
-    private String type;
+    private Integer type;
     private String through;
 
     @ElementCollection
     @CollectionTable(name = "attention", joinColumns = @JoinColumn(name = "document_id"))
     @Column(name = "attention_value")
-    private List<String> to;
+    private List<String> attention;
 
     private Integer campus;
-    private Long department;
+    private Integer department;
     private String from;
     private Integer numberOfPages;
     private String attachment;
@@ -35,4 +35,6 @@ public class DocumentGroup {
     @CollectionTable(name = "cc", joinColumns = @JoinColumn(name = "document_id"))
     @Column(name = "cc_value")
     private List<String> cc;
+    private Integer encoder;
+    private String message;
 }

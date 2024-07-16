@@ -35,4 +35,6 @@ public class DocumentMultiple {
     @CollectionTable(name = "cc", joinColumns = @JoinColumn(name = "document_id"))
     @Column(name = "cc_value")
     private List<String> cc;
+
+    private String message;
 }

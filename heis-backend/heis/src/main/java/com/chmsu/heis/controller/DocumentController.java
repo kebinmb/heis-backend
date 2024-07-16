@@ -44,25 +44,25 @@ public class DocumentController {
         }
     }
 
-    @PostMapping("/sgd")
-    public ResponseEntity<DocumentGroup> sendGroupDocument(@RequestBody DocumentGroup documentGroup) {
-       try{
-           DocumentGroup sentDocumentGroup = documentService.sendGroupDocument(documentGroup);
-           return ResponseEntity.ok(sentDocumentGroup);
-       }catch (Exception e){
-           logger.error("Error occurred while fetching next document number", e);
-           return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-       }
-    }
-    @PostMapping("/smd")
-    public ResponseEntity<DocumentMultiple> sendMultipleDocument(@RequestBody DocumentMultiple documentMultiple) {
-        try{
-            DocumentMultiple sentDocumentMultiple = documentService.sendMultipleDocument(documentMultiple);
-            return ResponseEntity.ok(sentDocumentMultiple);
-        }catch (Exception e){
-            logger.error("Error occurred while fetching next document number", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-        }
-    }
+//    @PostMapping("/sgd")
+//    public ResponseEntity<DocumentGroup> sendGroupDocument(@RequestBody DocumentGroup documentGroup) {
+//       try{
+//           DocumentGroup sentDocumentGroup = documentService.sendGroupDocument(documentGroup);
+//           return ResponseEntity.ok(sentDocumentGroup);
+//       }catch (Exception e){
+//           logger.error("Error occurred while fetching next document number", e);
+//           return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+//       }
+//    }
+//    @PostMapping("/smd")
+//    public ResponseEntity<DocumentMultiple> sendMultipleDocument(@RequestBody DocumentMultiple documentMultiple) {
+//        try{
+//            DocumentMultiple sentDocumentMultiple = documentService.sendMultipleDocument(documentMultiple);
+//            return ResponseEntity.ok(sentDocumentMultiple);
+//        }catch (Exception e){
+//            logger.error("Error occurred while fetching next document number", e);
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+//        }
+//    }
 
 }
