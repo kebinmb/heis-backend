@@ -11,15 +11,13 @@ import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.sql.Date;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/reports")
@@ -36,9 +34,12 @@ public class ReportsController {
 
 
     @GetMapping("monthly/{month}/{year}")
-    public ResponseEntity<List<MonthlyReports>> monthlyReports(@PathVariable("month") String month, @PathVariable("year") String year){
-        System.out.println(month);
-        List<MonthlyReports> monthlyReports = reportService.getMonthlyReports(month,year);
+    public ResponseEntity<List<MonthlyReports>> monthlyReports(
+            @PathVariable("month") String month,
+            @PathVariable("year") String year) {
+
+        // Implement logic to fetch monthly reports based on month and year
+        List<MonthlyReports> monthlyReports = reportService.getMonthlyReports(month, year);
         return ResponseEntity.ok(monthlyReports);
     }
 

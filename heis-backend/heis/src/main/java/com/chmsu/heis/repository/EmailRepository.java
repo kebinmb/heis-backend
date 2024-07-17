@@ -18,7 +18,7 @@ public interface EmailRepository extends JpaRepository<Email,Long>
                    @Param("subject") String subject,
                    @Param("dateOfLetter") String dateOfLetter,
                    @Param("type") Integer type,
-                   @Param("attention") String attention,
+                   @Param("attention") Integer attention,
                    @Param("through") String through,
                    @Param("from") String from,
                    @Param("pageCount") Integer pageCount,
@@ -35,5 +35,8 @@ public interface EmailRepository extends JpaRepository<Email,Long>
 
     @Query(value="SELECT email FROM user WHERE name = :name",nativeQuery = true)
     String getEmail(String name);
+
+    @Query(value="SELECT user_id FROM user WHERE email=:email",nativeQuery = true)
+    Integer getUserId(String email);
 }
 //Method for sending logs

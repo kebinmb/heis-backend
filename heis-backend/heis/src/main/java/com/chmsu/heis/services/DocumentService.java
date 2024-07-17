@@ -136,22 +136,22 @@ public class DocumentService {
 
         // Save the email details to the repository
         String formattedDate = formatDate(email.getDateOfLetter());
-        emailRepository.saveEmail(
-                email.getDocumentNumber(),
-                email.getSubject(),
-                formattedDate,
-                email.getType(),
-               attentionJson,
-                email.getThrough(),
-                email.getFrom(),
-                email.getNumberOfPages(),
-                email.getAttachment(),
-                email.getCampus(),
-                email.getDepartment(),
-                ccJson,
-                email.getEncoder(),
-                email.getMessage());
-        logsRepository.insertLogs(email.getEncoder(),email.getMessage(),email.getDateOfLetter());
+//        emailRepository.saveEmail(
+//                email.getDocumentNumber(),
+//                email.getSubject(),
+//                formattedDate,
+//                email.getType(),
+//               attentionJson,
+//                email.getThrough(),
+//                email.getFrom(),
+//                email.getNumberOfPages(),
+//                email.getAttachment(),
+//                email.getCampus(),
+//                email.getDepartment(),
+//                ccJson,
+//                email.getEncoder(),
+//                email.getMessage());
+//        logsRepository.insertLogs(email.getEncoder(),email.getMessage(),email.getDateOfLetter());
     }
 
     private String formatDate(java.sql.Date dateOfLetter) {
@@ -212,23 +212,23 @@ public class DocumentService {
         mailSender.send(mimeMessage);
 
         // Save the email details to the repository
-        String formattedDate = formatDate(email.getDateOfLetter());
-        emailRepository.saveEmail(
-                email.getDocumentNumber(),
-                email.getSubject(),
-                formattedDate,
-                email.getType(),
-                attentionJson,
-                email.getThrough(),
-                email.getFrom(),
-                email.getNumberOfPages(),
-                email.getAttachment(),
-                email.getCampus(),
-                email.getDepartment(),
-                ccJson,
-                email.getEncoder(),
-                email.getMessage());
-        logsRepository.insertLogs(email.getEncoder(),email.getMessage(),email.getDateOfLetter());
+//        String formattedDate = formatDate(email.getDateOfLetter());
+//        emailRepository.saveEmail(
+//                email.getDocumentNumber(),
+//                email.getSubject(),
+//                formattedDate,
+//                email.getType(),
+//                attentionJson,
+//                email.getThrough(),
+//                email.getFrom(),
+//                email.getNumberOfPages(),
+//                email.getAttachment(),
+//                email.getCampus(),
+//                email.getDepartment(),
+//                ccJson,
+//                email.getEncoder(),
+//                email.getMessage());
+//        logsRepository.insertLogs(email.getEncoder(),email.getMessage(),email.getDateOfLetter());
     }
 
 

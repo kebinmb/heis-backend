@@ -80,14 +80,16 @@ public class EmailService {
         // Send the email
         mailSender.send(mimeMessage);
 
+        Integer userIdAttention = emailRepository.getUserId(email.getAttention());
         // Save the email details to the repository
+        //CHANGE THE EMAIL TO INTEGER
         String formattedDate = formatDate(email.getDateOfLetter());
         emailRepository.saveEmail(
                 email.getDocumentNumber(),
                 email.getSubject(),
                 formattedDate,
                 email.getType(),
-                email.getAttention(),
+                userIdAttention,
                 email.getThrough(),
                 email.getFrom(),
                 email.getPageCount(),
