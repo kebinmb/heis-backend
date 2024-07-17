@@ -81,6 +81,8 @@ public class EmailService {
         mailSender.send(mimeMessage);
 
         Integer userIdAttention = emailRepository.getUserId(email.getAttention());
+        Integer userIdThrough = emailRepository.getUserId(email.getThrough());
+        Integer userIdFrom = emailRepository.getUserId(email.getFrom());
         // Save the email details to the repository
         //CHANGE THE EMAIL TO INTEGER
         String formattedDate = formatDate(email.getDateOfLetter());
@@ -90,8 +92,8 @@ public class EmailService {
                 formattedDate,
                 email.getType(),
                 userIdAttention,
-                email.getThrough(),
-                email.getFrom(),
+                userIdThrough,
+                userIdFrom,
                 email.getPageCount(),
                 email.getAttachment(),
                 email.getCampus(),

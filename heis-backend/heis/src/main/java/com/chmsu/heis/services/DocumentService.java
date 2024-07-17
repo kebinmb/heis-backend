@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
+import java.util.List;
 
 @Service
 public class DocumentService {
@@ -103,6 +104,7 @@ public class DocumentService {
         try {
             ccJson = objectMapper.writeValueAsString(email.getCc());
             attentionJson = objectMapper.writeValueAsString(email.getAttention());
+
         } catch (JsonProcessingException e) {
             e.printStackTrace();
             throw new RuntimeException("Failed to convert CC list to JSON", e);
@@ -133,7 +135,9 @@ public class DocumentService {
 
         // Send the email
         mailSender.send(mimeMessage);
-
+//        Integer userIdAttention = documentGroupRepository.getUserId(email.getAttention());
+//        Integer userIdThrough = documentGroupRepository.getUserId(email.getThrough());
+//        Integer userIdFrom = documentGroupRepository.getUserId(email.getFrom());
         // Save the email details to the repository
         String formattedDate = formatDate(email.getDateOfLetter());
 //        emailRepository.saveEmail(
