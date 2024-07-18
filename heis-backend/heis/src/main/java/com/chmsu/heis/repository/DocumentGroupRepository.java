@@ -35,5 +35,5 @@ public interface DocumentGroupRepository extends JpaRepository<DocumentGroup,Lon
                    @Param("message") String message);
 
     @Query(value="SELECT user_id FROM user WHERE email=:email",nativeQuery = true)
-    Integer getUserId(String email);
+    String getUserId(String email);
 }

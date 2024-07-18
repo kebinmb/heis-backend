@@ -40,68 +40,64 @@ public class EmailService {
                 "<pre>" + email.getMessage() + "</pre>" +  // Preserve formatting with <pre> tag
                 "</body></html>";
 
-        // Set basic email attributes
-        helper.setFrom(from);
-        helper.setTo(email.getAttention());
-        helper.setSubject(email.getSubject());
-        helper.setText(htmlContent,true);
-
-        // Process CC addresses
-        ObjectMapper objectMapper = new ObjectMapper();
-        String ccJson;
         try {
-            ccJson = objectMapper.writeValueAsString(email.getCc());
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            throw new RuntimeException("Failed to convert CC list to JSON", e);
-        }
+            // Set basic email attributes
+            helper.setFrom(from);
+            helper.setTo(email.getAttention());
+            helper.setSubject(email.getSubject());
+            helper.setText(htmlContent, true);
 
-        String[] ccArray;
-        try {
-            ccArray = objectMapper.readValue(ccJson, String[].class);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            throw new RuntimeException("Failed to convert JSON to CC array", e);
-        }
+            // Process CC addresses
+            ObjectMapper objectMapper = new ObjectMapper();
+            String ccJson = objectMapper.writeValueAsString(email.getCc());
+            String[] ccArray = objectMapper.readValue(ccJson, String[].class);
+            helper.setCc(ccArray);
 
-        helper.setCc(ccArray);
-
-        // Attach the file if present
-        if (email.getAttachment() != null && !email.getAttachment().isEmpty()) {
-            File file = new File(email.getAttachment());
-            if (file.exists() && file.isFile()) {
-                FileSystemResource fileResource = new FileSystemResource(file);
-                helper.addAttachment(fileResource.getFilename(), fileResource);
-            } else {
-                System.out.println("Attachment file is not found");
+            // Attach the file if present
+            if (email.getAttachment() != null && !email.getAttachment().isEmpty()) {
+                File file = new File(email.getAttachment());
+                if (file.exists() && file.isFile()) {
+                    FileSystemResource fileResource = new FileSystemResource(file);
+                    helper.addAttachment(fileResource.getFilename(), fileResource);
+                } else {
+                    System.out.println("Attachment file not found");
+                }
             }
+
+            // Save the email details to the repository
+            Integer userIdAttention = emailRepository.getUserId(email.getAttention());
+            Integer userIdThrough = emailRepository.getUserId(email.getThrough());
+            Integer userIdFrom = emailRepository.getUserId(email.getFrom());
+            String formattedDate = formatDate(email.getDateOfLetter());
+            emailRepository.saveEmail(
+                    email.getDocumentNumber(),
+                    email.getSubject(),
+                    formattedDate,
+                    email.getType(),
+                    userIdAttention,
+                    userIdThrough,
+                    userIdFrom,
+                    email.getPageCount(),
+                    email.getAttachment(),
+                    email.getCampus(),
+                    email.getDepartmentId(),
+                    ccJson,
+                    email.getEncoder(),
+                    email.getMessage()
+            );
+
+            logsRepository.insertLogs(email.getEncoder(), email.getMessage(), email.getDateOfLetter());
+
+            // Send the email only after successful database insertion
+            mailSender.send(mimeMessage);
+
+        } catch (MessagingException e) {
+            throw new MessagingException("Failed to send email", e);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Failed to process CC addresses", e);
+        } catch (Exception e) {
+            throw new RuntimeException("An error occurred while sending the email or saving to the repository", e);
         }
-
-        // Send the email
-        mailSender.send(mimeMessage);
-
-        Integer userIdAttention = emailRepository.getUserId(email.getAttention());
-        Integer userIdThrough = emailRepository.getUserId(email.getThrough());
-        Integer userIdFrom = emailRepository.getUserId(email.getFrom());
-        // Save the email details to the repository
-        //CHANGE THE EMAIL TO INTEGER
-        String formattedDate = formatDate(email.getDateOfLetter());
-        emailRepository.saveEmail(
-                email.getDocumentNumber(),
-                email.getSubject(),
-                formattedDate,
-                email.getType(),
-                userIdAttention,
-                userIdThrough,
-                userIdFrom,
-                email.getPageCount(),
-                email.getAttachment(),
-                email.getCampus(),
-                email.getDepartmentId(),
-                ccJson,
-                email.getEncoder(),
-                email.getMessage());
-        logsRepository.insertLogs(email.getEncoder(),email.getMessage(),email.getDateOfLetter());
     }
 
     private String formatDate(java.sql.Date dateOfLetter) {

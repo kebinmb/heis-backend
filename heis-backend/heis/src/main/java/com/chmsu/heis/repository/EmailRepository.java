@@ -29,6 +29,42 @@ public interface EmailRepository extends JpaRepository<Email,Long>
                    @Param("encoder") Integer encoder,
                    @Param("message") String message);
 
+    @Modifying
+    @Transactional
+    @Query(value = "INSERT INTO document (document_number, subject, date_of_letter, type, attention, through, `from`, page_count, attachment, campus, department_id, cc, encoder,message) VALUES (:documentNumber, :subject, :dateOfLetter, :type, :attention, :through, :from, :pageCount, :attachment, :campus, :departmentId, :cc, :encoder,:message)", nativeQuery = true)
+    void saveEmailGroup(@Param("documentNumber") Integer documentNumber,
+                   @Param("subject") String subject,
+                   @Param("dateOfLetter") String dateOfLetter,
+                   @Param("type") Integer type,
+                   @Param("attention") String attention,
+                   @Param("through") String through,
+                   @Param("from") String from,
+                   @Param("pageCount") Integer pageCount,
+                   @Param("attachment") String attachment,
+                   @Param("campus") Integer campus,
+                   @Param("departmentId") Integer departmentId,
+                   @Param("cc") String cc,
+                   @Param("encoder") Integer encoder,
+                   @Param("message") String message);
+
+    @Modifying
+    @Transactional
+    @Query(value = "INSERT INTO document (document_number, subject, date_of_letter, type, attention, through, `from`, page_count, attachment, campus, department_id, cc, encoder,message) VALUES (:documentNumber, :subject, :dateOfLetter, :type, :attention, :through, :from, :pageCount, :attachment, :campus, :departmentId, :cc, :encoder,:message)", nativeQuery = true)
+    void saveEmailMultiple(@Param("documentNumber") Integer documentNumber,
+                        @Param("subject") String subject,
+                        @Param("dateOfLetter") String dateOfLetter,
+                        @Param("type") Integer type,
+                        @Param("attention") String attention,
+                        @Param("through") Integer through,
+                        @Param("from") Integer from,
+                        @Param("pageCount") Integer pageCount,
+                        @Param("attachment") String attachment,
+                        @Param("campus") Integer campus,
+                        @Param("departmentId") Integer departmentId,
+                        @Param("cc") String cc,
+                        @Param("encoder") Integer encoder,
+                        @Param("message") String message);
+
     @Query(value="SELECT MAX(document_number) + 1 AS next_document_number\n" +
             "FROM document;",nativeQuery = true)
     Integer documentNumber();

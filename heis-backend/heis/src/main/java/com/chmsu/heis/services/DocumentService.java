@@ -19,7 +19,10 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class DocumentService {
@@ -93,34 +96,12 @@ public class DocumentService {
 
         // Set basic email attributes
         helper.setFrom(from);
-
         helper.setSubject(email.getSubject());
-        helper.setText(htmlContent,true);
+        helper.setText(htmlContent, true);
 
-        // Process CC addresses
-        ObjectMapper objectMapper = new ObjectMapper();
-        String ccJson;
-        String attentionJson;
-        try {
-            ccJson = objectMapper.writeValueAsString(email.getCc());
-            attentionJson = objectMapper.writeValueAsString(email.getAttention());
-
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            throw new RuntimeException("Failed to convert CC list to JSON", e);
-        }
-
-        String[] ccArray;
-        String[] attentionArray;
-        try {
-            ccArray = objectMapper.readValue(ccJson, String[].class);
-            attentionArray = objectMapper.readValue(attentionJson, String[].class);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            throw new RuntimeException("Failed to convert JSON to CC array", e);
-        }
-        helper.setTo(attentionArray);
-        helper.setCc(ccArray);
+        // Set To and CC addresses
+        helper.setTo(email.getAttention().toArray(new String[0]));
+        helper.setCc(email.getCc().toArray(new String[0]));
 
         // Attach the file if present
         if (email.getAttachment() != null && !email.getAttachment().isEmpty()) {
@@ -129,34 +110,73 @@ public class DocumentService {
                 FileSystemResource fileResource = new FileSystemResource(file);
                 helper.addAttachment(fileResource.getFilename(), fileResource);
             } else {
-                System.out.println("Attachment file is not found");
+                System.out.println("Attachment file not found: " + email.getAttachment());
             }
         }
 
         // Send the email
         mailSender.send(mimeMessage);
-//        Integer userIdAttention = documentGroupRepository.getUserId(email.getAttention());
-//        Integer userIdThrough = documentGroupRepository.getUserId(email.getThrough());
-//        Integer userIdFrom = documentGroupRepository.getUserId(email.getFrom());
+
+        // Convert attention addresses to Integer user IDs
+        List<String> attentionArrayNumber = new ArrayList<>();
+        for (String attention : email.getAttention()) {
+            String attentionId = documentGroupRepository.getUserId(attention);
+            if (attentionId != null) {
+                attentionArrayNumber.add(attentionId);
+            } else {
+                System.out.println("User ID not found for attention: " + attention);
+            }
+        }
+
+        // Convert other fields to Integer user IDs
+        String userIdThrough = documentGroupRepository.getUserId(email.getThrough());
+        String userIdFrom = documentGroupRepository.getUserId(email.getFrom());
+
+        // Convert attentionArrayNumber to JSON
+        ObjectMapper objectMapper = new ObjectMapper();
+        String attentionJson;
+        String ccJson;
+        try {
+            attentionJson = objectMapper.writeValueAsString(attentionArrayNumber);
+            ccJson = objectMapper.writeValueAsString(email.getCc());
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Failed to convert attentionArrayNumber or CC list to JSON", e);
+        }
+        String attention = convertAttentionListToJsonOrDelimitedString(attentionArrayNumber);
+
         // Save the email details to the repository
         String formattedDate = formatDate(email.getDateOfLetter());
-//        emailRepository.saveEmail(
-//                email.getDocumentNumber(),
-//                email.getSubject(),
-//                formattedDate,
-//                email.getType(),
-//               attentionJson,
-//                email.getThrough(),
-//                email.getFrom(),
-//                email.getNumberOfPages(),
-//                email.getAttachment(),
-//                email.getCampus(),
-//                email.getDepartment(),
-//                ccJson,
-//                email.getEncoder(),
-//                email.getMessage());
-//        logsRepository.insertLogs(email.getEncoder(),email.getMessage(),email.getDateOfLetter());
+        emailRepository.saveEmailGroup(
+                email.getDocumentNumber(),
+                email.getSubject(),
+                formattedDate,
+                email.getType(),
+                attention, // Save attention JSON
+                userIdThrough,
+                userIdFrom,
+                email.getNumberOfPages(),
+                email.getAttachment(),
+                email.getCampus(),
+                email.getDepartment(),
+                ccJson,
+                email.getEncoder(),
+                email.getMessage()
+        );
+
+        // Log the email details
+        logsRepository.insertLogs(email.getEncoder(), email.getMessage(), email.getDateOfLetter());
     }
+
+    private String convertAttentionListToJsonOrDelimitedString(List<String> attentionList) {
+        // Convert list to JSON array or delimited string, depending on chosen approach
+        // Example implementation:
+        // return new ObjectMapper().writeValueAsString(attentionList);
+        return String.join(",", attentionList);
+    }
+
+
+
 
     private String formatDate(java.sql.Date dateOfLetter) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -173,33 +193,12 @@ public class DocumentService {
 
         // Set basic email attributes
         helper.setFrom(from);
-
         helper.setSubject(email.getSubject());
-        helper.setText(htmlContent,true);
+        helper.setText(htmlContent, true);
 
-        // Process CC addresses
-        ObjectMapper objectMapper = new ObjectMapper();
-        String ccJson;
-        String attentionJson;
-        try {
-            ccJson = objectMapper.writeValueAsString(email.getCc());
-            attentionJson = objectMapper.writeValueAsString(email.getAttention());
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            throw new RuntimeException("Failed to convert CC list to JSON", e);
-        }
-
-        String[] ccArray;
-        String[] attentionArray;
-        try {
-            ccArray = objectMapper.readValue(ccJson, String[].class);
-            attentionArray = objectMapper.readValue(attentionJson, String[].class);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            throw new RuntimeException("Failed to convert JSON to CC array", e);
-        }
-        helper.setTo(attentionArray);
-        helper.setCc(ccArray);
+        // Set To and CC addresses
+        helper.setTo(email.getAttention().toArray(new String[0]));
+        helper.setCc(email.getCc().toArray(new String[0]));
 
         // Attach the file if present
         if (email.getAttachment() != null && !email.getAttachment().isEmpty()) {
@@ -208,32 +207,61 @@ public class DocumentService {
                 FileSystemResource fileResource = new FileSystemResource(file);
                 helper.addAttachment(fileResource.getFilename(), fileResource);
             } else {
-                System.out.println("Attachment file is not found");
+                System.out.println("Attachment file not found: " + email.getAttachment());
             }
         }
 
         // Send the email
         mailSender.send(mimeMessage);
 
-        // Save the email details to the repository
-//        String formattedDate = formatDate(email.getDateOfLetter());
-//        emailRepository.saveEmail(
-//                email.getDocumentNumber(),
-//                email.getSubject(),
-//                formattedDate,
-//                email.getType(),
-//                attentionJson,
-//                email.getThrough(),
-//                email.getFrom(),
-//                email.getNumberOfPages(),
-//                email.getAttachment(),
-//                email.getCampus(),
-//                email.getDepartment(),
-//                ccJson,
-//                email.getEncoder(),
-//                email.getMessage());
-//        logsRepository.insertLogs(email.getEncoder(),email.getMessage(),email.getDateOfLetter());
-    }
+        // Convert attention addresses to Integer user IDs
+        List<String> attentionArrayNumber = new ArrayList<>();
+        for (String attention : email.getAttention()) {
+            String attentionId = documentGroupRepository.getUserId(attention);
+            if (attentionId != null) {
+                attentionArrayNumber.add(attentionId);
+            } else {
+                System.out.println("User ID not found for attention: " + attention);
+            }
+        }
 
+        // Convert other fields to Integer user IDs
+        String userIdThrough = documentGroupRepository.getUserId(email.getThrough());
+        String userIdFrom = documentGroupRepository.getUserId(email.getFrom());
+
+        // Convert attentionArrayNumber to JSON
+        ObjectMapper objectMapper = new ObjectMapper();
+        String attentionJson;
+        String ccJson;
+        try {
+            attentionJson = objectMapper.writeValueAsString(email.getAttention());
+            ccJson = objectMapper.writeValueAsString(email.getCc());
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Failed to convert attentionArrayNumber or CC list to JSON", e);
+        }
+
+        // Save the email details to the repository
+        String formattedDate = formatDate(email.getDateOfLetter());
+        emailRepository.saveEmailGroup(
+                email.getDocumentNumber(),
+                email.getSubject(),
+                formattedDate,
+                email.getType(),
+                attentionJson, // Save attention JSON as VARCHAR
+                userIdThrough,
+                userIdFrom,
+                email.getNumberOfPages(),
+                email.getAttachment(),
+                email.getCampus(),
+                email.getDepartment(),
+                ccJson,
+                email.getEncoder(),
+                email.getMessage()
+        );
+
+        // Log the email details
+        logsRepository.insertLogs(email.getEncoder(), email.getMessage(), email.getDateOfLetter());
+    }
 
 }

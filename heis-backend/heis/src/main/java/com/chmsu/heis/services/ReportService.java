@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -37,12 +38,26 @@ public class ReportService {
         return reportsRepository.dailyReport(formattedDate);
     }
 
-    public List<MonthlyReports> getMonthlyReports(String month, String year){
-        try{
-            System.out.println(month);
-            return monthlyReportsRepository.monthlyReport(month,year);
-        }catch (Exception e){
-            throw new RuntimeException("System encountered an exception",e);
+    public List<MonthlyReports> getMonthlyReports(String month, String year) {
+        try {
+            List<Object[]> results = monthlyReportsRepository.monthlyReport(month, year);
+            List<MonthlyReports> reports = new ArrayList<>();
+
+            for (Object[] result : results) {
+                MonthlyReports report = new MonthlyReports();
+                report.setFrom((String) result[0]);
+                report.setDepartmentId((Integer) result[1]);
+                report.setAttention((String) result[2]); // Ensure attention is mapped correctly
+                report.setDocumentNumber((Integer) result[3]);
+                report.setDocumentId((Integer) result[4]);
+                report.setName((String) result[5]);
+                report.setDocCount(((Number) result[6]).intValue());
+
+                reports.add(report);
+            }
+            return reports;
+        } catch (Exception e) {
+            throw new RuntimeException("System encountered an exception", e);
         }
     }
 

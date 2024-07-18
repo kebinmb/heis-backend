@@ -23,7 +23,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/emails")
 public class EmailController {
-    private static final String UPLOAD_DIR = "/Users/kevin/Downloads";
+    private static final String UPLOAD_DIR = "/Users/User/Downloads";
 
     @Autowired
     private EmailService emailService;

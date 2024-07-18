@@ -18,7 +18,7 @@ public class MonthlyReports {
     private String from;
     private Integer departmentId;
     private Integer docCount;
-    private Integer attention;
+    private String attention;
     private Integer documentNumber;
 
 }
