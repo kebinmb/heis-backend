@@ -52,4 +52,6 @@ public interface UserRepository extends JpaRepository<User,Long> {
     User findByUsernameAndPasswordAndAccessLevel(@Param("username") String username,
                                                  @Param("password") String password,
                                                  @Param("accessLevels") List<Integer> accessLevels);
+
+
 }

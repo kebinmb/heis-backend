@@ -21,6 +21,9 @@ public class Reports {
     private String subject;
     private Integer encoder;
     private Integer type;
+    private String from;
+    private String attention;
+    private String through;
 
 //    private String status;
 }
