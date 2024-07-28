@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface EmailRepository extends JpaRepository<Email,Long>
 {
@@ -22,7 +24,7 @@ public interface EmailRepository extends JpaRepository<Email,Long>
                    @Param("through") Integer through,
                    @Param("from") Integer from,
                    @Param("pageCount") Integer pageCount,
-                   @Param("attachment") String attachment,
+                   @Param("attachment") String  attachment,
                    @Param("campus") Integer campus,
                    @Param("departmentId") Integer departmentId,
                    @Param("cc") String cc,

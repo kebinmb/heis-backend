@@ -5,6 +5,7 @@ import com.chmsu.heis.model.document.Email;
 import com.chmsu.heis.services.DocumentService;
 import com.chmsu.heis.services.EmailService;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,7 +19,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/emails")
@@ -32,7 +35,7 @@ public class EmailController {
     private DocumentService documentService;
     @PostMapping("/send")
     public ResponseEntity<String> sendEmail(
-            @RequestParam("attachment") MultipartFile file,
+            @RequestParam("attachment") List<MultipartFile> files,
             @RequestParam("documentNumber") Integer documentNumber,
             @RequestParam("subject") String subject,
             @RequestParam("dateOfLetter") Date dateOfLetter,
@@ -48,21 +51,30 @@ public class EmailController {
             @RequestParam("departmentId") Integer departmentId) throws MessagingException {
 
         try {
-            // Create the local folder if it does not exist
-            File folder = new File(UPLOAD_DIR);
-            if (!folder.exists()) {
-                folder.mkdirs();
+            List<String> fileNames = new ArrayList<>();
+            for (MultipartFile file : files) {
+                String uniqueFileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+                Path path = Paths.get(UPLOAD_DIR, uniqueFileName);
+
+                Files.write(path, file.getBytes());
+                fileNames.add(uniqueFileName);
             }
 
-            // Create the path to the file
-            Path path = Paths.get(UPLOAD_DIR, file.getOriginalFilename());
+            // List to hold file paths
+            List<String> attachmentPaths = new ArrayList<>();
+            for (MultipartFile file : files) {
+                // Create the path to the file
+                Path path = Paths.get(UPLOAD_DIR, file.getOriginalFilename());
+                Files.createDirectories(path.getParent());
+                // Write the file to the local folder
+                Files.write(path, file.getBytes());
 
-            // Write the file to the local folder
-            Files.write(path, file.getBytes());
+                // Add the file path to the list
+                attachmentPaths.add(path.toString());
+            }
 
-            // Construct the Email object
             Email email = new Email();
-            email.setAttachment(path.toString());;
+            email.setAttachment(attachmentPaths); ;
             email.setDocumentNumber(documentNumber);
             email.setSubject(subject);
             email.setDateOfLetter(dateOfLetter);
@@ -77,34 +89,14 @@ public class EmailController {
             email.setMessage(message);
             email.setDepartmentId(departmentId);
 
-            // Call the service method to send the email
             emailService.sendEmail(email);
 
-            return ResponseEntity.ok("Email sent and file uploaded successfully: " + file.getOriginalFilename());
+            return ResponseEntity.ok("Email sent and files uploaded successfully.");
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("File upload failed: " + e.getMessage());
         }
     }
-    @PostMapping("/api/upload")
-    public ResponseEntity<String> handleFileUpload(@RequestParam("file") MultipartFile file) {
-        try {
-            // Create the local folder if it does not exist
-            File folder = new File(UPLOAD_DIR);
-            if (!folder.exists()) {
-                folder.mkdirs();
-            }
 
-            // Create the path to the file
-            Path path = Paths.get(UPLOAD_DIR, file.getOriginalFilename());
-
-            // Write the file to the local folder
-            Files.write(path, file.getBytes());
-
-            return ResponseEntity.ok("File uploaded successfully: " + file.getOriginalFilename());
-        } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("File upload failed: " + e.getMessage());
-        }
-    }
     @GetMapping("/docnum")
     public Integer getDocumentNumber(){
         return emailService.documentNumberCount();
@@ -112,13 +104,13 @@ public class EmailController {
 
     @GetMapping("/specificemail")
     public ResponseEntity<String> getEmailAddress(@RequestParam("name") String name){
-    String emailAddress = emailService.getEmail(name);
-    return ResponseEntity.ok(emailAddress);
+        String emailAddress = emailService.getEmail(name);
+        return ResponseEntity.ok(emailAddress);
     }
 
     @PostMapping("/sendGroup")
     public ResponseEntity<String> sendGroupEmail(
-            @RequestParam("attachment") MultipartFile file,
+            @RequestParam("attachment") List<MultipartFile> files,
             @RequestParam("documentNumber") Integer documentNumber,
             @RequestParam("subject") String subject,
             @RequestParam("dateOfLetter") Date dateOfLetter,
@@ -135,20 +127,31 @@ public class EmailController {
 
         try {
             // Create the local folder if it does not exist
-            File folder = new File(UPLOAD_DIR);
-            if (!folder.exists()) {
-                folder.mkdirs();
+            List<String> fileNames = new ArrayList<>();
+            for (MultipartFile file : files) {
+                String uniqueFileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+                Path path = Paths.get(UPLOAD_DIR, uniqueFileName);
+
+                Files.write(path, file.getBytes());
+                fileNames.add(uniqueFileName);
             }
 
-            // Create the path to the file
-            Path path = Paths.get(UPLOAD_DIR, file.getOriginalFilename());
+            // List to hold file paths
+            List<String> attachmentPaths = new ArrayList<>();
+            for (MultipartFile file : files) {
+                // Create the path to the file
+                Path path = Paths.get(UPLOAD_DIR, file.getOriginalFilename());
+                Files.createDirectories(path.getParent());
+                // Write the file to the local folder
+                Files.write(path, file.getBytes());
 
-            // Write the file to the local folder
-            Files.write(path, file.getBytes());
+                // Add the file path to the list
+                attachmentPaths.add(path.toString());
+            }
 
             // Construct the Email object
             DocumentGroup email = new DocumentGroup();
-            email.setAttachment(path.toString());;
+            email.setAttachment(attachmentPaths);;
             email.setDocumentNumber(documentNumber);
             email.setSubject(subject);
             email.setDateOfLetter(dateOfLetter);
@@ -166,7 +169,7 @@ public class EmailController {
             // Call the service method to send the email
             documentService.sendGroupDocument(email);
 
-            return ResponseEntity.ok("Email sent and file uploaded successfully: " + file.getOriginalFilename());
+            return ResponseEntity.ok("Email sent and files uploaded successfully.");
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("File upload failed: " + e.getMessage());
         }
@@ -174,7 +177,7 @@ public class EmailController {
 
     @PostMapping("/sendMultiple")
     public ResponseEntity<String> sendMultipleEmail(
-            @RequestParam("attachment") MultipartFile file,
+            @RequestParam("attachment") List<MultipartFile> files,
             @RequestParam("documentNumber") Integer documentNumber,
             @RequestParam("subject") String subject,
             @RequestParam("dateOfLetter") Date dateOfLetter,
@@ -190,21 +193,31 @@ public class EmailController {
             @RequestParam("departmentId") Integer departmentId) throws MessagingException {
 
         try {
-            // Create the local folder if it does not exist
-            File folder = new File(UPLOAD_DIR);
-            if (!folder.exists()) {
-                folder.mkdirs();
+            List<String> fileNames = new ArrayList<>();
+            for (MultipartFile file : files) {
+                String uniqueFileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+                Path path = Paths.get(UPLOAD_DIR, uniqueFileName);
+
+                Files.write(path, file.getBytes());
+                fileNames.add(uniqueFileName);
             }
 
-            // Create the path to the file
-            Path path = Paths.get(UPLOAD_DIR, file.getOriginalFilename());
+            // List to hold file paths
+            List<String> attachmentPaths = new ArrayList<>();
+            for (MultipartFile file : files) {
+                // Create the path to the file
+                Path path = Paths.get(UPLOAD_DIR, file.getOriginalFilename());
+                Files.createDirectories(path.getParent());
+                // Write the file to the local folder
+                Files.write(path, file.getBytes());
 
-            // Write the file to the local folder
-            Files.write(path, file.getBytes());
+                // Add the file path to the list
+                attachmentPaths.add(path.toString());
+            }
 
             // Construct the Email object
             DocumentGroup email = new DocumentGroup();
-            email.setAttachment(path.toString());;
+            email.setAttachment(attachmentPaths);;
             email.setDocumentNumber(documentNumber);
             email.setSubject(subject);
             email.setDateOfLetter(dateOfLetter);
@@ -222,7 +235,7 @@ public class EmailController {
             // Call the service method to send the email
             documentService.sendGroupDocument(email);
 
-            return ResponseEntity.ok("Email sent and file uploaded successfully: " + file.getOriginalFilename());
+            return ResponseEntity.ok("Email sent and files uploaded successfully.");
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("File upload failed: " + e.getMessage());
         }

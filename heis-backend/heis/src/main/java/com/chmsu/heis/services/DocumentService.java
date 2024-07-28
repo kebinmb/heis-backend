@@ -86,7 +86,7 @@ public class DocumentService {
         return document;
     }
 
-    public void sendGroupDocument(DocumentGroup email) throws MessagingException {
+    public void sendGroupDocument(DocumentGroup email) throws MessagingException, JsonProcessingException {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true);
         String htmlContent = "<html><body>" +
@@ -102,15 +102,20 @@ public class DocumentService {
         // Set To and CC addresses
         helper.setTo(email.getAttention().toArray(new String[0]));
         helper.setCc(email.getCc().toArray(new String[0]));
-
-        // Attach the file if present
+        ObjectMapper objectMapper = new ObjectMapper();
+        List<String> attachmentFilenames = new ArrayList<>();
         if (email.getAttachment() != null && !email.getAttachment().isEmpty()) {
-            File file = new File(email.getAttachment());
-            if (file.exists() && file.isFile()) {
-                FileSystemResource fileResource = new FileSystemResource(file);
-                helper.addAttachment(fileResource.getFilename(), fileResource);
-            } else {
-                System.out.println("Attachment file not found: " + email.getAttachment());
+            for (String attachmentPath : email.getAttachment()) {
+                File file = new File(attachmentPath);
+                if (file.exists() && file.isFile()) {
+                    FileSystemResource fileResource = new FileSystemResource(file);
+                    helper.addAttachment(fileResource.getFilename(), fileResource);
+                    // Extract the filename
+                    String fileName = file.getName();
+                    attachmentFilenames.add(fileName);
+                } else {
+                    System.out.println("Attachment file not found: " + attachmentPath);
+                }
             }
         }
 
@@ -131,9 +136,8 @@ public class DocumentService {
         // Convert other fields to Integer user IDs
         String userIdThrough = documentGroupRepository.getUserId(email.getThrough());
         String userIdFrom = documentGroupRepository.getUserId(email.getFrom());
-
+        String attachmentJson = objectMapper.writeValueAsString(attachmentFilenames);
         // Convert attentionArrayNumber to JSON
-        ObjectMapper objectMapper = new ObjectMapper();
         String attentionJson;
         String ccJson;
         try {
@@ -156,7 +160,7 @@ public class DocumentService {
                 userIdThrough,
                 userIdFrom,
                 email.getNumberOfPages(),
-                email.getAttachment(),
+                attachmentJson,
                 email.getCampus(),
                 email.getDepartment(),
                 ccJson,
@@ -183,7 +187,7 @@ public class DocumentService {
         return dateFormat.format(dateOfLetter);
     }
 
-    public void sendMultiple(DocumentGroup email) throws MessagingException {
+    public void sendMultiple(DocumentGroup email) throws MessagingException, JsonProcessingException {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true);
         String htmlContent = "<html><body>" +
@@ -199,17 +203,25 @@ public class DocumentService {
         // Set To and CC addresses
         helper.setTo(email.getAttention().toArray(new String[0]));
         helper.setCc(email.getCc().toArray(new String[0]));
-
+        ObjectMapper objectMapper = new ObjectMapper();
         // Attach the file if present
+        List<String> attachmentFilenames = new ArrayList<>();
         if (email.getAttachment() != null && !email.getAttachment().isEmpty()) {
-            File file = new File(email.getAttachment());
-            if (file.exists() && file.isFile()) {
-                FileSystemResource fileResource = new FileSystemResource(file);
-                helper.addAttachment(fileResource.getFilename(), fileResource);
-            } else {
-                System.out.println("Attachment file not found: " + email.getAttachment());
+            for (String attachmentPath : email.getAttachment()) {
+                File file = new File(attachmentPath);
+                if (file.exists() && file.isFile()) {
+                    FileSystemResource fileResource = new FileSystemResource(file);
+                    helper.addAttachment(fileResource.getFilename(), fileResource);
+                    // Extract the filename
+                    String fileName = file.getName();
+                    attachmentFilenames.add(fileName);
+                } else {
+                    System.out.println("Attachment file not found: " + attachmentPath);
+                }
             }
         }
+
+        String attachmentJson = objectMapper.writeValueAsString(attachmentFilenames);
 
         // Send the email
         mailSender.send(mimeMessage);
@@ -230,7 +242,7 @@ public class DocumentService {
         String userIdFrom = documentGroupRepository.getUserId(email.getFrom());
 
         // Convert attentionArrayNumber to JSON
-        ObjectMapper objectMapper = new ObjectMapper();
+
         String attentionJson;
         String ccJson;
         try {
@@ -252,7 +264,7 @@ public class DocumentService {
                 userIdThrough,
                 userIdFrom,
                 email.getNumberOfPages(),
-                email.getAttachment(),
+               attachmentJson,
                 email.getCampus(),
                 email.getDepartment(),
                 ccJson,

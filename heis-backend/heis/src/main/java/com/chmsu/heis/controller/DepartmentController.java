@@ -27,7 +27,7 @@ public class DepartmentController {
             List<Department> departmentDetails = departmentService.getAllDepartmentDetails();
             return ResponseEntity.ok(departmentDetails);
         }catch(Exception e){
-            logger.error("Error occurred while fetching faculty details", e);
+            logger.error("Error occurred while fetching department details", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
@@ -38,7 +38,7 @@ public class DepartmentController {
            departmentService.addNewDepartment(department);
            return ResponseEntity.ok(department);
         }catch (Exception e){
-            logger.error("Error occurred while fetching next document number", e);
+            logger.error("Error occurred while fetching new department", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }

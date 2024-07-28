@@ -29,7 +29,10 @@ public class DocumentMultiple {
     private Long department;
     private String from;
     private Integer numberOfPages;
-    private String attachment;
+    @ElementCollection
+    @CollectionTable(name = "attachment", joinColumns = @JoinColumn(name = "document_id"))
+    @Column(name = "attachment_value")
+    private List<String> attachment;
 
     @ElementCollection
     @CollectionTable(name = "cc", joinColumns = @JoinColumn(name = "document_id"))

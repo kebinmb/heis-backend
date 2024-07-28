@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 @Service
 public class EmailService {
@@ -54,13 +55,19 @@ public class EmailService {
             helper.setCc(ccArray);
 
             // Attach the file if present
+            List<String> attachmentFilenames = new ArrayList<>();
             if (email.getAttachment() != null && !email.getAttachment().isEmpty()) {
-                File file = new File(email.getAttachment());
-                if (file.exists() && file.isFile()) {
-                    FileSystemResource fileResource = new FileSystemResource(file);
-                    helper.addAttachment(fileResource.getFilename(), fileResource);
-                } else {
-                    System.out.println("Attachment file not found");
+                for (String attachmentPath : email.getAttachment()) {
+                    File file = new File(attachmentPath);
+                    if (file.exists() && file.isFile()) {
+                        FileSystemResource fileResource = new FileSystemResource(file);
+                        helper.addAttachment(fileResource.getFilename(), fileResource);
+                        // Extract the filename
+                        String fileName = file.getName();
+                        attachmentFilenames.add(fileName);
+                    } else {
+                        System.out.println("Attachment file not found: " + attachmentPath);
+                    }
                 }
             }
 
@@ -68,6 +75,7 @@ public class EmailService {
             Integer userIdAttention = emailRepository.getUserId(email.getAttention());
             Integer userIdThrough = emailRepository.getUserId(email.getThrough());
             Integer userIdFrom = emailRepository.getUserId(email.getFrom());
+            String attachmentJson = objectMapper.writeValueAsString(attachmentFilenames);
             String formattedDate = formatDate(email.getDateOfLetter());
             emailRepository.saveEmail(
                     email.getDocumentNumber(),
@@ -78,7 +86,7 @@ public class EmailService {
                     userIdThrough,
                     userIdFrom,
                     email.getPageCount(),
-                    email.getAttachment(),
+                    attachmentJson,
                     email.getCampus(),
                     email.getDepartmentId(),
                     ccJson,
@@ -100,7 +108,7 @@ public class EmailService {
         }
     }
 
-    private String formatDate(java.sql.Date dateOfLetter) {
+    private String formatDate(Date dateOfLetter) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         return dateFormat.format(dateOfLetter);
     }

@@ -18,11 +18,14 @@ public class Email {
     private String subject;
     private Date dateOfLetter;
     private Integer type;
-    private String attention;//to
+    private String attention;
     private String through;
     private String from;
     private Integer pageCount;
-    private String attachment;
+    @ElementCollection
+    @CollectionTable(name = "attachment", joinColumns = @JoinColumn(name = "document_id"))
+    @Column(name = "attachment_value")
+    private List<String> attachment;
     private Integer campus;
     private Integer departmentId;
     @ElementCollection
