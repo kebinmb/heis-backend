@@ -3,6 +3,7 @@ package com.chmsu.heis.controller;
 
 import com.chmsu.heis.model.document.Department;
 import com.chmsu.heis.services.DepartmentService;
+import com.chmsu.heis.services.LogsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,7 @@ public class DepartmentController {
 
     @Autowired
     private DepartmentService departmentService;
+    private LogsService logsService;
 
 
     @GetMapping("/departdetails")
@@ -26,6 +28,7 @@ public class DepartmentController {
         try{
             List<Department> departmentDetails = departmentService.getAllDepartmentDetails();
             return ResponseEntity.ok(departmentDetails);
+
         }catch(Exception e){
             logger.error("Error occurred while fetching department details", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
@@ -33,12 +36,27 @@ public class DepartmentController {
     }
 
     @PostMapping("/newdep")
-    public ResponseEntity<Department> addNewDepartment(@RequestBody Department department){
-        try{
-           departmentService.addNewDepartment(department);
-           return ResponseEntity.ok(department);
-        }catch (Exception e){
-            logger.error("Error occurred while fetching new department", e);
+    public ResponseEntity<Department> addNewDepartment(
+            @RequestParam("departmentCode") String departmentCode,
+            @RequestParam("departmentTitle") String departmentTitle,
+            @RequestParam("emailReceiver") Long emailReceiver,
+            @RequestParam("campus") Long campus,
+            @RequestParam("departmentId") Long departmentId) {
+
+        try {
+            Department department = new Department();
+            department.setDepartmentCode(departmentCode);
+            department.setDepartmentTitle(departmentTitle);
+            department.setEmailReceiver(emailReceiver);
+            department.setCampus(campus);
+            department.setDepartmentId(departmentId);
+
+            // Save department using service (pseudo code)
+            departmentService.addNewDepartment(department);
+
+            return ResponseEntity.ok(department);
+        } catch (Exception e) {
+            logger.error("Error occurred while adding new department", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
