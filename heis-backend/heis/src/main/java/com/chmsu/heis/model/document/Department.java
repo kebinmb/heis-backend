@@ -25,3 +25,5 @@ public class Department {
     private Long campus;
 
 }
+
+
