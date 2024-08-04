@@ -37,6 +37,4 @@ public interface DepartmentRepository extends JpaRepository<Department,Long> {
             @Param("emailReceiver") Long emailReceiver,
             @Param("departmentId") Long departmentId
     );
-
-
 }
