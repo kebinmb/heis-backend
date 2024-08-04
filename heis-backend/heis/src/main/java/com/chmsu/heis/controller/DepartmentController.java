@@ -2,11 +2,13 @@ package com.chmsu.heis.controller;
 
 
 import com.chmsu.heis.model.document.Department;
+import com.chmsu.heis.model.document.NewUser;
 import com.chmsu.heis.services.DepartmentService;
 import com.chmsu.heis.services.LogsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -79,6 +81,30 @@ public class DepartmentController {
             return ResponseEntity.noContent().build();
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @PostMapping("/new/user")
+    public ResponseEntity<NewUser> addNewUser(@RequestBody NewUser newUser) {
+        try {
+            // Ensure that all required fields are set in the NewUser object
+            if (newUser.getUserName() == null || newUser.getUserName().isEmpty()) {
+                return ResponseEntity.badRequest().body(null);
+            }
+
+            // Call the service layer to add the new user
+            NewUser addedUser = departmentService.addNewUser(newUser);
+
+            // Return the added user in the response
+            return ResponseEntity.ok(addedUser);
+        } catch (DataAccessException dae) {
+            // Handle database access exceptions
+            logger.error("Database error occurred while adding new user", dae);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        } catch (Exception e) {
+            // Handle other exceptions
+            logger.error("System error occurred while adding new user", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 
