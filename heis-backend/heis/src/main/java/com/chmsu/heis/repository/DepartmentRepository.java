@@ -37,4 +37,7 @@ public interface DepartmentRepository extends JpaRepository<Department,Long> {
             @Param("emailReceiver") Long emailReceiver,
             @Param("departmentId") Long departmentId
     );
+
+    @Query(value="SELECT COUNT(*) FROM user",nativeQuery = true)
+    Integer getTotalUser();
 }

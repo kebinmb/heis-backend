@@ -18,9 +18,9 @@ public interface NewUserRepository extends JpaRepository<NewUser, Long> {
             nativeQuery = true)
     void addNewUser(
             @Param("userId") Integer userId,
-            @Param("name") String name,
             @Param("username") String username,
             @Param("password") String password,
+            @Param("name") String name,
             @Param("designation") String designation,
             @Param("departmentId") Integer departmentId,
             @Param("campus") Integer campus,

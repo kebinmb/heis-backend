@@ -96,4 +96,8 @@ public class DepartmentService {
         }
     }
 
+    public Integer getTotalUser(){
+        return this.departmentRepository.getTotalUser();
+    }
+
 }

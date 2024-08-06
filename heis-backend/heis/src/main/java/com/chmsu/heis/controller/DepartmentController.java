@@ -108,4 +108,12 @@ public class DepartmentController {
         }
     }
 
+    @GetMapping("/user/total")
+    public ResponseEntity<Integer> getTotalUser() {
+        Integer totalUsers = this.departmentService.getTotalUser();
+        return ResponseEntity.ok(totalUsers); // Use ResponseEntity.ok() to set status to 200 OK and pass the response body
+    }
+
+
+
 }
