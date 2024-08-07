@@ -17,6 +17,10 @@ public class UserService {
     private UserRepository userRepository;
     private LogsRepository logsRepository;
 
+    public UserService(LogsRepository logsRepository){
+        this.logsRepository = logsRepository;
+    }
+
     public List<User> getFacultyDetails() {
         try {
             return userRepository.getAllFacultyDetails();
@@ -85,6 +89,15 @@ public class UserService {
 
     public User findUser(String username, String password) {
         List<Integer> accessLevels = Arrays.asList(1, 4);
+        java.util.Date utilDate = new java.util.Date();
+        Date sqlDate = new Date(utilDate.getTime());
+        Long userId = userRepository.findUserIdByName(username);
+        // Log the addition of the new department
+        logsRepository.insertLogs(
+                userId,
+                "Login Successful for User:"+username,
+                sqlDate
+        );
         return userRepository.findByUsernameAndPasswordAndAccessLevel(username, password, accessLevels);
     }
 

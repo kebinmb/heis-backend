@@ -13,20 +13,18 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Date;
+import java.util.List;
 
 @Repository
 public interface LogsRepository extends JpaRepository<Logs,Long> {
-    @Query(value = "SELECT logs.*\n" +
-            "FROM logs\n" +
-            "INNER JOIN user ON user.user_id = logs.user_id\n" +
-            "WHERE DATE(logs.timestamp) = :date\n" +
-            "  AND user.campus = :campus\n" +
-            "  AND logs.message LIKE :keyword\n" +
-            "ORDER BY logs.timestamp;\n",nativeQuery = true)
-    Logs getLogs(@Param("date")String date,
-                 @Param("campus")Integer campus,
-                 @Param("keyword")String keyword);
-
+    @Query(value = "SELECT logs.* " +
+            "FROM logs " +
+            "INNER JOIN user ON user.user_id = logs.user_id " +
+            "WHERE DATE(logs.timestamp) = :date " +
+            " AND user.campus = :campus " +
+            "AND (message LIKE '%Login Successful%' OR message LIKE '%authenticated%')"+
+            "ORDER BY logs.timestamp;", nativeQuery = true)
+    List<Logs> getLogs(@Param("date") String date, @Param("campus") Integer campus);
 
     @Modifying
     @Transactional

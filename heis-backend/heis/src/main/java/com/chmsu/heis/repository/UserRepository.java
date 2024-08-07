@@ -74,5 +74,10 @@ public interface UserRepository extends JpaRepository<User,Long> {
             @Param("userId") Long userId
     );
 
+    @Query(value="SELECT user_id FROM document.user WHERE username = :username;",nativeQuery = true)
+    Long findUserIdByName(
+            @Param("username") String username
+    );
+
 
 }

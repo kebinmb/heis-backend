@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/logs")
 public class LogsController {
@@ -16,9 +18,8 @@ public class LogsController {
     private LogsService logsService;
 
     @GetMapping("/searchlogs")
-    public Logs getLogs(@RequestParam String date,
-                        @RequestParam Integer campus,
-                        @RequestParam String keyword){
-        return logsService.getLogs(date,campus,keyword);
+    public List<Logs> getLogs(@RequestParam String date,
+                              @RequestParam Integer campus) {
+        return logsService.getLogs(date, campus);
     }
 }

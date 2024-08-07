@@ -5,6 +5,7 @@ import com.chmsu.heis.repository.LogsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 
 
 @Service
@@ -13,7 +14,7 @@ public class LogsService {
     private LogsRepository logsRepository;
 
     //Authentication Logs
-    public Logs getLogs(String date,Integer campus, String keyword){
-        return logsRepository.getLogs(date,campus,"%"+ keyword +"%");
+    public List<Logs> getLogs(String date, Integer campus) {
+        return logsRepository.getLogs(date, campus);
     }
 }
