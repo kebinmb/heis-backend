@@ -32,7 +32,7 @@ public interface LogsRepository extends JpaRepository<Logs,Long> {
     @Transactional
     @Query(value="INSERT INTO logs (user_id,message,timestamp) VALUES (:userId,:message,:timestamp)",nativeQuery = true)
     void insertLogs(
-                    @Param("userId")Integer userId,
+                    @Param("userId")Long userId,
                     @Param("message")String message,
                     @Param("timestamp")Date date);
 }

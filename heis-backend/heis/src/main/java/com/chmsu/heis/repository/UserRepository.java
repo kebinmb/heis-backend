@@ -1,7 +1,9 @@
 package com.chmsu.heis.repository;
 
 import com.chmsu.heis.model.document.User;
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -54,6 +56,23 @@ public interface UserRepository extends JpaRepository<User,Long> {
     User findByUsernameAndPasswordAndAccessLevel(@Param("username") String username,
                                                  @Param("password") String password,
                                                  @Param("accessLevels") List<Integer> accessLevels);
+
+    @Modifying
+    @Transactional
+    @Query(value = "UPDATE user SET name = :name, designation = :designation, department_id = :departmentId, campus = :campus, company_name = :companyName, access_level = :accessLevel, employee_type = :employeeType, permanent = :permanent, email_receiver = :emailReceiver, email = :email WHERE user_id = :userId", nativeQuery = true)
+    void updateUserDetails(
+            @Param("name") String name,
+            @Param("designation") String designation,
+            @Param("departmentId") Long departmentId,
+            @Param("campus") Long campus,
+            @Param("companyName") String companyName,
+            @Param("accessLevel") Long accessLevel,
+            @Param("employeeType") String employeeType,
+            @Param("permanent") Long permanent,
+            @Param("emailReceiver") Long emailReceiver,
+            @Param("email") String email,
+            @Param("userId") Long userId
+    );
 
 
 }

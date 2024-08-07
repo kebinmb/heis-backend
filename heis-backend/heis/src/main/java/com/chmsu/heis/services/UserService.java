@@ -1,10 +1,13 @@
 package com.chmsu.heis.services;
 
 import com.chmsu.heis.model.document.User;
+import com.chmsu.heis.repository.LogsRepository;
 import com.chmsu.heis.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
+import java.sql.Date;
 import java.util.Arrays;
 import java.util.List;
 
@@ -12,6 +15,7 @@ import java.util.List;
 public class UserService {
     @Autowired
     private UserRepository userRepository;
+    private LogsRepository logsRepository;
 
     public List<User> getFacultyDetails() {
         try {
@@ -86,5 +90,26 @@ public class UserService {
 
     public List<User> getAllUser(){
         return userRepository.getAllUser();
+    }
+
+    //Delete Department
+    public void deleteUserById(Long userId) {
+        try {
+            java.util.Date utilDate = new java.util.Date();
+            Date sqlDate = new Date(utilDate.getTime());
+
+            // Log the addition of the new department
+            logsRepository.insertLogs(
+                    userId,
+                    "Deleted a Department",
+                    sqlDate
+            );
+            userRepository.deleteById(userId);
+
+        } catch (EmptyResultDataAccessException e) {
+            throw new RuntimeException("Department not found with id: " + userId, e);
+        } catch (Exception e) {
+            throw new RuntimeException("System encountered an Exception", e);
+        }
     }
 }

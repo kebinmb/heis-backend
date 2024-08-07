@@ -3,6 +3,7 @@ package com.chmsu.heis.controller;
 
 import com.chmsu.heis.model.document.Department;
 import com.chmsu.heis.model.document.NewUser;
+import com.chmsu.heis.model.document.User;
 import com.chmsu.heis.services.DepartmentService;
 import com.chmsu.heis.services.LogsService;
 import org.slf4j.Logger;
@@ -83,6 +84,15 @@ public class DepartmentController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+    @DeleteMapping("/del/user/{id}")
+    public ResponseEntity<Void> deleteUser(@PathVariable("id") Long userId) {
+        try {
+            departmentService.deleteUserById(userId);
+            return ResponseEntity.noContent().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 
     @PostMapping("/new/user")
     public ResponseEntity<NewUser> addNewUser(@RequestBody NewUser newUser) {
@@ -113,6 +123,24 @@ public class DepartmentController {
         Integer totalUsers = this.departmentService.getTotalUser();
         return ResponseEntity.ok(totalUsers); // Use ResponseEntity.ok() to set status to 200 OK and pass the response body
     }
+
+    @PutMapping("/edit/user/{id}")
+    public ResponseEntity<User> updateUser(@PathVariable("id") Long userId, @RequestBody User user) {
+        try {
+            User updatedUser = departmentService.editUserDetails(user, userId);
+            if (updatedUser != null) {
+                return ResponseEntity.ok(updatedUser);
+            } else {
+                // Return a 404 Not Found if the user wasn't found or updated
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            }
+        } catch (Exception e) {
+            // General exception catch to handle unexpected errors
+            logger.error("Error occurred while updating user with ID " + userId, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
 
 
 
