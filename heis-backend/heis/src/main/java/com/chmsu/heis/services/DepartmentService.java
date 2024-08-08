@@ -153,7 +153,7 @@ public class DepartmentService {
             // Log the addition of the new department
             logsRepository.insertLogs(
                     departmentRepository.getTotalUser().longValue()+1,
-                    "Added a new recipient",
+                    "Added a new user",
                     sqlDate
             );
             return newUser;
@@ -189,7 +189,7 @@ public class DepartmentService {
             // Log the addition of the new department
             logsRepository.insertLogs(
                     user.getUserId(),
-                    "Edit a Department",
+                    "Edited user details",
                     sqlDate
             );
             return user;
