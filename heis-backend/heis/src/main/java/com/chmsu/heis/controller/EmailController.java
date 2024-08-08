@@ -26,7 +26,8 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/emails")
 public class EmailController {
-    private static final String UPLOAD_DIR = "/Users/kevin/Downloads";
+
+    private static final String UPLOAD_DIR = "/Apache24/htdocs/heis/uploads";
 
     @Autowired
     private EmailService emailService;

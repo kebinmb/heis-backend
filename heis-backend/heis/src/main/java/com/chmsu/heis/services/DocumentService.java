@@ -169,7 +169,7 @@ public class DocumentService {
         );
 
         // Log the email details
-        logsRepository.insertLogs(email.getEncoder().longValue(), email.getMessage(), email.getDateOfLetter());
+        logsRepository.insertLogs(email.getEncoder().longValue(), "Proccessed document number: "+email.getDocumentNumber().toString(), email.getDateOfLetter());
     }
 
     private String convertAttentionListToJsonOrDelimitedString(List<String> attentionList) {
@@ -273,7 +273,7 @@ public class DocumentService {
         );
 
         // Log the email details
-        logsRepository.insertLogs(email.getEncoder().longValue(), email.getMessage(), email.getDateOfLetter());
+        logsRepository.insertLogs(email.getEncoder().longValue(), "Proccessed document number: "+email.getDocumentNumber().toString(), email.getDateOfLetter());
     }
 
 }

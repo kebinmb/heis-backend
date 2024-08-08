@@ -1,9 +1,6 @@
 package com.chmsu.heis.model.document;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -22,6 +19,7 @@ public class User {
     private Long departmentId;
     private Long campus;
     private String companyName;
+    @Column(name="access_level")
     private Long accessLevel;
     private String employeeType;
     private Long permanent;

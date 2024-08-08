@@ -52,10 +52,10 @@ public interface UserRepository extends JpaRepository<User,Long> {
     @Query(value="SELECT * FROM user",nativeQuery = true)
     List<User> getAllUser();
 
-    @Query("SELECT u FROM User u WHERE u.username = :username AND u.password = :password AND u.accessLevel IN (:accessLevels)")
+    @Query(value = "SELECT * FROM USER WHERE username=:username and password=:password AND access_level = :accessLevel",nativeQuery = true)
     User findByUsernameAndPasswordAndAccessLevel(@Param("username") String username,
                                                  @Param("password") String password,
-                                                 @Param("accessLevels") List<Integer> accessLevels);
+                                                 @Param("accessLevel") Long accessLevel);
 
     @Modifying
     @Transactional
@@ -76,6 +76,11 @@ public interface UserRepository extends JpaRepository<User,Long> {
 
     @Query(value="SELECT user_id FROM document.user WHERE username = :username;",nativeQuery = true)
     Long findUserIdByName(
+            @Param("username") String username
+    );
+
+    @Query(value="SELECT access_level FROM document.user WHERE username=:username;",nativeQuery = true)
+    Long findAccessLevelByName(
             @Param("username") String username
     );
 

@@ -1,6 +1,8 @@
 package com.chmsu.heis.controller;
 
+import com.chmsu.heis.model.document.AuthenticationRequest;
 import com.chmsu.heis.model.document.User;
+import com.chmsu.heis.model.document.UserToken;
 import com.chmsu.heis.repository.UserRepository;
 import com.chmsu.heis.services.UserService;
 import org.apache.coyote.Response;
@@ -117,15 +119,10 @@ public class UserController {
     }
 
 
-    @GetMapping("/authenticate")
-    public ResponseEntity<?> authenticateUser(@RequestParam String username,
-                                              @RequestParam String password) {
-        User user = userService.findUser(username, password);
-        if (user != null) {
-            return ResponseEntity.ok(user);
-        } else {
-            return ResponseEntity.status(401).body("Invalid credentials or insufficient access level");
-        }
+    @PostMapping("/authenticate")
+    public ResponseEntity<UserToken> authenticate(@RequestBody AuthenticationRequest request) {
+        UserToken userToken = userService.findUser(request.getUsername(), request.getPassword());
+        return ResponseEntity.ok(userToken);
     }
 
     @GetMapping("/users")

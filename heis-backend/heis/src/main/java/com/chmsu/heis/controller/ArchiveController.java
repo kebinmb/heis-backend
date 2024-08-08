@@ -26,7 +26,7 @@ import java.util.List;
 public class ArchiveController {
     private static final Logger logger = LoggerFactory.getLogger(ArchiveController.class);
 
-    private final String imageFolderPath = "/Users/kevin/Downloads";
+    private final String imageFolderPath = "/Apache24/htdocs/heis/uploads";
     @Autowired
     private ArchiveService archiveService;
 

@@ -26,6 +26,25 @@ public interface LogsRepository extends JpaRepository<Logs,Long> {
             "ORDER BY logs.timestamp;", nativeQuery = true)
     List<Logs> getLogs(@Param("date") String date, @Param("campus") Integer campus);
 
+
+    @Query(value = "SELECT logs.* " +
+            "FROM logs " +
+            "INNER JOIN user ON user.user_id = logs.user_id " +
+            "WHERE DATE(logs.timestamp) = :date " +
+            " AND user.campus = :campus " +
+            "AND (message LIKE '%Processed document%')"+
+            "ORDER BY logs.timestamp;", nativeQuery = true)
+    List<Logs> getDocumentLogs(@Param("date") String date, @Param("campus") Integer campus);
+
+    @Query(value = "SELECT logs.* " +
+            "FROM logs " +
+            "INNER JOIN user ON user.user_id = logs.user_id " +
+            "WHERE DATE(logs.timestamp) = :date " +
+            " AND user.campus = :campus " +
+            "AND (message LIKE '%Added a new user%' OR LIKE '%updated user%')"+
+            "ORDER BY logs.timestamp;", nativeQuery = true)
+    List<Logs> getUserMaintenanceLogs(@Param("date") String date, @Param("campus") Integer campus);
+
     @Modifying
     @Transactional
     @Query(value="INSERT INTO logs (user_id,message,timestamp) VALUES (:userId,:message,:timestamp)",nativeQuery = true)

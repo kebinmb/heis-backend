@@ -1,6 +1,8 @@
 package com.chmsu.heis.services;
 
+import com.chmsu.heis.model.document.JwtUtil;
 import com.chmsu.heis.model.document.User;
+import com.chmsu.heis.model.document.UserToken;
 import com.chmsu.heis.repository.LogsRepository;
 import com.chmsu.heis.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,8 +19,14 @@ public class UserService {
     private UserRepository userRepository;
     private LogsRepository logsRepository;
 
-    public UserService(LogsRepository logsRepository){
+    private JwtUtil jwtUtil;
+
+
+
+
+    public UserService(LogsRepository logsRepository, JwtUtil jwtUtil){
         this.logsRepository = logsRepository;
+        this.jwtUtil = jwtUtil;
     }
 
     public List<User> getFacultyDetails() {
@@ -87,18 +95,26 @@ public class UserService {
     }
 
 
-    public User findUser(String username, String password) {
-        List<Integer> accessLevels = Arrays.asList(1, 4);
+    public UserToken findUser(String username, String password) {
+        Long accessLevel = userRepository.findAccessLevelByName(username);
         java.util.Date utilDate = new java.util.Date();
-        Date sqlDate = new Date(utilDate.getTime());
-        Long userId = userRepository.findUserIdByName(username);
-        // Log the addition of the new department
-        logsRepository.insertLogs(
-                userId,
-                "Login Successful for User:"+username,
-                sqlDate
-        );
-        return userRepository.findByUsernameAndPasswordAndAccessLevel(username, password, accessLevels);
+        User user = userRepository.findByUsernameAndPasswordAndAccessLevel(username, password, accessLevel);
+        System.out.println(user);
+        if (user != null) {
+            // Generate JWT token
+            System.out.println(accessLevel);
+            String token = jwtUtil.generateToken(username);
+            Date sqlDate = new Date(utilDate.getTime());
+            Long userId = userRepository.findUserIdByName(username);
+            logsRepository.insertLogs(
+                    userId,
+                    "Login Successful for User:" + username,
+                    sqlDate
+            );
+            return new UserToken(user, token);
+        } else {
+            throw new RuntimeException("Invalid credentials");
+        }
     }
 
     public List<User> getAllUser(){

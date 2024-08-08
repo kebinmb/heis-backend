@@ -94,7 +94,7 @@ public class EmailService {
                     email.getMessage()
             );
 
-            logsRepository.insertLogs(email.getEncoder().longValue(), email.getMessage(), email.getDateOfLetter());
+            logsRepository.insertLogs(email.getEncoder().longValue(), "Proccessed document number: "+email.getDocumentNumber().toString(), email.getDateOfLetter());
 
             // Send the email only after successful database insertion
             mailSender.send(mimeMessage);

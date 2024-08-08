@@ -17,4 +17,14 @@ public class LogsService {
     public List<Logs> getLogs(String date, Integer campus) {
         return logsRepository.getLogs(date, campus);
     }
+
+    //Document Processing Logs
+    public List<Logs> getDocumentLogs(String date, Integer campus){
+        return logsRepository.getDocumentLogs(date,campus);
+    }
+
+    //User Maintenance Logs
+    public List<Logs> getUserMaintenanceLogs(String date, Integer campus){
+        return logsRepository.getUserMaintenanceLogs(date,campus);
+    }
 }
