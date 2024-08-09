@@ -32,4 +32,9 @@ public class LogsController {
     public  List<Logs> getUserMaintenanceLogs(@RequestParam String date, @RequestParam Integer campus){
         return logsService.getUserMaintenanceLogs(date,campus);
     }
+
+    @GetMapping("/usercredlogs")
+    public  List<Logs> getUserCredentialsLogs(@RequestParam String date, @RequestParam Integer campus){
+        return  logsService.getUserCredentialsMaintenaceLogs(date,campus);
+    }
 }

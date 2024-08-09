@@ -130,4 +130,28 @@ public class UserController {
         List<User> allUsers = userService.getAllUser();
         return ResponseEntity.ok(allUsers);
     }
+
+    @PostMapping("/updatecreds")
+    public ResponseEntity<String> updateUserCred(@RequestParam(required = false) String name,
+                                                 @RequestParam(required = false) String password) {
+        if (name == null || password == null) {
+            return ResponseEntity.badRequest().body("Required parameters 'name' and 'password' are missing.");
+        }
+
+        try {
+            // Assuming updateUserCredentials throws an exception if something goes wrong
+            userService.updateUserCredentials(name, password);
+            return ResponseEntity.ok("Credentials updated successfully");
+        } catch (Exception e) {
+            // Log the exception and return an appropriate HTTP response
+            e.printStackTrace(); // Or use a logging framework
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating credentials");
+        }
+    }
+
+    @GetMapping("/pw")
+    public ResponseEntity<String> getUserPassword(@RequestParam String name){
+        String password = userService.getUserPassword(name);
+        return ResponseEntity.ok(password);
+    }
 }

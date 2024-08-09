@@ -79,10 +79,24 @@ public interface UserRepository extends JpaRepository<User,Long> {
             @Param("username") String username
     );
 
+    @Query(value="SELECT user_id FROM document.user WHERE name = :name;",nativeQuery = true)
+    Long findUser(
+            @Param("name") String name
+    );
+
     @Query(value="SELECT access_level FROM document.user WHERE username=:username;",nativeQuery = true)
     Long findAccessLevelByName(
             @Param("username") String username
     );
 
+    @Modifying
+    @Transactional
+    @Query(value = "UPDATE user SET password = :password WHERE name = :name", nativeQuery = true)
+    void updateUserCredentials(@Param("name") String name,
+                               @Param("password") String password
+                              );
 
+
+    @Query(value="SELECT password FROM user WHERE name=:name",nativeQuery = true)
+    String getUserPassword(@Param("name") String name);
 }

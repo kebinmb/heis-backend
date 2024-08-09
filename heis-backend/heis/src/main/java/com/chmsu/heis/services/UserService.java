@@ -6,12 +6,16 @@ import com.chmsu.heis.model.document.UserToken;
 import com.chmsu.heis.repository.LogsRepository;
 import com.chmsu.heis.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
+import javax.naming.Name;
 import java.sql.Date;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @Service
 public class UserService {
@@ -28,7 +32,7 @@ public class UserService {
         this.logsRepository = logsRepository;
         this.jwtUtil = jwtUtil;
     }
-
+    private static final Logger logger = Logger.getLogger(UserService.class.getName());
     public List<User> getFacultyDetails() {
         try {
             return userRepository.getAllFacultyDetails();
@@ -139,6 +143,42 @@ public class UserService {
             throw new RuntimeException("Department not found with id: " + userId, e);
         } catch (Exception e) {
             throw new RuntimeException("System encountered an Exception", e);
+        }
+    }
+
+    public void updateUserCredentials(String name, String password) {
+        try {
+            // Update user credentials
+
+            userRepository.updateUserCredentials(name, password);
+
+            // Retrieve user ID
+            Long adminId = userRepository.findUser(name);
+            if (adminId == null) {
+                throw new RuntimeException("User ID not found for name: " + name);
+            }
+
+            // Get current date
+            java.util.Date utilDate = new java.util.Date();
+            Date sqlDate = new Date(utilDate.getTime());
+
+            // Insert log entry
+            logsRepository.insertLogs(adminId, "Updated user credentials for: " + name, sqlDate);
+
+        } catch (DataAccessException dae) {
+            logger.log(Level.SEVERE, "Data access error while updating user credentials", dae);
+            throw new RuntimeException("Unable to update user credentials due to data access error");
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Unexpected error while updating user credentials", e);
+            throw new RuntimeException("Unable to update user credentials due to an unexpected error");
+        }
+    }
+
+    public String getUserPassword(String name){
+        try{
+            return userRepository.getUserPassword(name);
+        }catch (Exception e){
+            throw new RuntimeException("Unable to retrieve password");
         }
     }
 }

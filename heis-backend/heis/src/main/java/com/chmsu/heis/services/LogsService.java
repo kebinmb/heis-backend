@@ -30,4 +30,9 @@ public class LogsService {
         System.out.println("User Maintenance Logs:"+logsRepository.getUserMaintenanceLogs(date,campus));
         return logsRepository.getUserMaintenanceLogs(date,campus);
     }
+
+    //User credentials maintenance Logs
+    public List<Logs> getUserCredentialsMaintenaceLogs(String date, Integer campus){
+        return logsRepository.getUserCredentialsMaintenanceLogs(date,campus);
+    }
 }
