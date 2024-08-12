@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
@@ -19,31 +20,48 @@ import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
+
 @Service
 public class EmailService {
-    @Autowired
-    private JavaMailSender mailSender;
-
     @Autowired
     private EmailRepository emailRepository;
 
     @Autowired
     private LogsRepository logsRepository;
 
-    @Value("${spring.mail.username}")
-    private String from;
+    // Method to configure JavaMailSender dynamically
+    private JavaMailSender getDynamicJavaMailSender(String host, int port, String username, String password) {
+        JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
+        mailSender.setHost(host);
+        mailSender.setPort(port);
+        mailSender.setUsername(username);
+        mailSender.setPassword(password);
 
-    public void sendEmail(Email email) throws MessagingException {
+        Properties props = mailSender.getJavaMailProperties();
+        props.put("mail.transport.protocol", "smtp");
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.debug", "false");
+
+        return mailSender;
+    }
+
+    public void sendEmail(Email email, String host, int port, String username, String password) throws MessagingException {
+        // Get a dynamically configured JavaMailSender
+        JavaMailSender mailSender = getDynamicJavaMailSender(host, port, username, password);
+
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true);
+
         String htmlContent = "<html><body>" +
                 "<h2>Records Management System</h2>" +
-                "<pre>" + email.getMessage() + "</pre>" +  // Preserve formatting with <pre> tag
+                "<pre>" + email.getMessage() + "</pre>" +
                 "</body></html>";
 
         try {
             // Set basic email attributes
-            helper.setFrom(from);
+            helper.setFrom(username);
             helper.setTo(email.getAttention());
             helper.setSubject(email.getSubject());
             helper.setText(htmlContent, true);
@@ -62,9 +80,7 @@ public class EmailService {
                     if (file.exists() && file.isFile()) {
                         FileSystemResource fileResource = new FileSystemResource(file);
                         helper.addAttachment(fileResource.getFilename(), fileResource);
-                        // Extract the filename
-                        String fileName = file.getName();
-                        attachmentFilenames.add(fileName);
+                        attachmentFilenames.add(file.getName());
                     } else {
                         System.out.println("Attachment file not found: " + attachmentPath);
                     }
@@ -94,7 +110,7 @@ public class EmailService {
                     email.getMessage()
             );
 
-            logsRepository.insertLogs(email.getEncoder().longValue(), "Proccessed document number: "+email.getDocumentNumber().toString(), email.getDateOfLetter());
+            logsRepository.insertLogs(email.getEncoder().longValue(), "Processed document number: " + email.getDocumentNumber(), email.getDateOfLetter());
 
             // Send the email only after successful database insertion
             mailSender.send(mimeMessage);
@@ -117,9 +133,10 @@ public class EmailService {
         return emailRepository.documentNumber();
     }
 
-    public String getEmail(String name){
+    public String getEmail(String name) {
         return emailRepository.getEmail(name);
     }
+
     public Email getEmailById(Long id) {
         return emailRepository.findById(id).orElse(null);
     }

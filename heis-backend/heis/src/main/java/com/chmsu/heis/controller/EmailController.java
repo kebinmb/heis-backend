@@ -8,6 +8,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,13 +28,27 @@ import java.util.UUID;
 @RequestMapping("/emails")
 public class EmailController {
 
-    private static final String UPLOAD_DIR = "/Apache24/htdocs/heis/uploads";
+//    private static final String UPLOAD_DIR = "/Apache24/htdocs/heis/uploads";
+    private static final String UPLOAD_DIR = "/Users/kevin/Downloads";
 
     @Autowired
     private EmailService emailService;
 
     @Autowired
     private DocumentService documentService;
+
+    @Value("${email.host:default-host}")
+    private String defaultHost; // Inject from properties with a default value
+
+    @Value("${email.port:25}")
+    private int defaultPort; // Inject from properties with a default value
+
+    @Value("${email.username:default-username}")
+    private String defaultUsername; // Inject from properties with a default value
+
+    @Value("${email.password:default-password}")
+    private String defaultPassword; // Inject from properties with a default value
+
     @PostMapping("/send")
     public ResponseEntity<String> sendEmail(
             @RequestParam("attachment") List<MultipartFile> files,
@@ -49,33 +64,31 @@ public class EmailController {
             @RequestParam("cc") List<String> cc,
             @RequestParam("encoder") Integer encoder,
             @RequestParam("message") String message,
-            @RequestParam("departmentId") Integer departmentId) throws MessagingException {
+            @RequestParam("departmentId") Integer departmentId,
+            @RequestParam(value = "host", required = false) String host, // Optional parameter
+            @RequestParam(value = "port", required = false) Integer port, // Optional parameter
+            @RequestParam(value = "username", required = false) String username, // Optional parameter
+            @RequestParam(value = "password", required = false) String password // Optional parameter
+    ) throws MessagingException {
+
+        // Use default values if parameters are not provided
+        host = (host != null) ? host : defaultHost;
+        port = (port != null) ? port : defaultPort;
+        username = (username != null) ? username : defaultUsername;
+        password = (password != null) ? password : defaultPassword;
 
         try {
-            List<String> fileNames = new ArrayList<>();
+            // Prepare attachments
+            List<String> attachmentPaths = new ArrayList<>();
             for (MultipartFile file : files) {
                 String uniqueFileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
                 Path path = Paths.get(UPLOAD_DIR, uniqueFileName);
-
                 Files.write(path, file.getBytes());
-                fileNames.add(uniqueFileName);
-            }
-
-            // List to hold file paths
-            List<String> attachmentPaths = new ArrayList<>();
-            for (MultipartFile file : files) {
-                // Create the path to the file
-                Path path = Paths.get(UPLOAD_DIR, file.getOriginalFilename());
-                Files.createDirectories(path.getParent());
-                // Write the file to the local folder
-                Files.write(path, file.getBytes());
-
-                // Add the file path to the list
                 attachmentPaths.add(path.toString());
             }
 
+            // Create an Email object
             Email email = new Email();
-            email.setAttachment(attachmentPaths); ;
             email.setDocumentNumber(documentNumber);
             email.setSubject(subject);
             email.setDateOfLetter(dateOfLetter);
@@ -89,15 +102,17 @@ public class EmailController {
             email.setEncoder(encoder);
             email.setMessage(message);
             email.setDepartmentId(departmentId);
-
-            emailService.sendEmail(email);
+            email.setAttachment(attachmentPaths);
+            System.out.println(username);
+            System.out.println(password);
+            // Call the email service with the correct number of arguments
+            emailService.sendEmail(email, host, port, username, password);
 
             return ResponseEntity.ok("Email sent and files uploaded successfully.");
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("File upload failed: " + e.getMessage());
         }
     }
-
     @GetMapping("/docnum")
     public Integer getDocumentNumber(){
         return emailService.documentNumberCount();
