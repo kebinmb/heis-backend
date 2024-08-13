@@ -13,16 +13,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class DocumentService {
@@ -33,8 +31,7 @@ public class DocumentService {
     @Autowired
     private DocumentMultipleRepository documentMultipleRepository;
 
-    @Autowired
-    private JavaMailSender mailSender;
+
 
     @Autowired
     private EmailRepository emailRepository;
@@ -42,8 +39,8 @@ public class DocumentService {
     @Autowired
     private LogsRepository logsRepository;
 
-    @Value("${spring.mail.username}")
-    private String from;
+//    @Value("${spring.mail.username}")
+//    private String from;
     //Service Method for getting the next Document Number
     public Integer getNextDocumentNumber(){
        Integer currentDocumentNumber =  this.documentRepository.getNextDocumentNumber();
@@ -86,7 +83,24 @@ public class DocumentService {
         return document;
     }
 
-    public void sendGroupDocument(DocumentGroup email) throws MessagingException, JsonProcessingException {
+    private JavaMailSender getDynamicJavaMailSender(String host, int port, String username, String password) {
+        JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
+        mailSender.setHost(host);
+        mailSender.setPort(port);
+        mailSender.setUsername(username);
+        mailSender.setPassword(password);
+
+        Properties props = mailSender.getJavaMailProperties();
+        props.put("mail.transport.protocol", "smtp");
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.debug", "false");
+
+        return mailSender;
+    }
+    public void sendGroupDocument(DocumentGroup email, String host, int port, String username, String password) throws MessagingException, JsonProcessingException {
+        JavaMailSender mailSender = getDynamicJavaMailSender(host, port, username, password);
+
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true);
         String htmlContent = "<html><body>" +
@@ -95,7 +109,7 @@ public class DocumentService {
                 "</body></html>";
 
         // Set basic email attributes
-        helper.setFrom(from);
+        helper.setFrom(username);
         helper.setSubject(email.getSubject());
         helper.setText(htmlContent, true);
 
@@ -187,7 +201,8 @@ public class DocumentService {
         return dateFormat.format(dateOfLetter);
     }
 
-    public void sendMultiple(DocumentGroup email) throws MessagingException, JsonProcessingException {
+    public void sendMultiple(DocumentGroup email,String host, int port, String username, String password) throws MessagingException, JsonProcessingException {
+        JavaMailSender mailSender = getDynamicJavaMailSender(host, port, username, password);
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true);
         String htmlContent = "<html><body>" +
@@ -196,7 +211,7 @@ public class DocumentService {
                 "</body></html>";
 
         // Set basic email attributes
-        helper.setFrom(from);
+        helper.setFrom(username);
         helper.setSubject(email.getSubject());
         helper.setText(htmlContent, true);
 
@@ -264,7 +279,7 @@ public class DocumentService {
                 userIdThrough,
                 userIdFrom,
                 email.getNumberOfPages(),
-               attachmentJson,
+                attachmentJson,
                 email.getCampus(),
                 email.getDepartment(),
                 ccJson,

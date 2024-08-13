@@ -139,8 +139,16 @@ public class EmailController {
             @RequestParam("cc") List<String> cc,
             @RequestParam("encoder") Integer encoder,
             @RequestParam("message") String message,
-            @RequestParam("departmentId") Integer departmentId) throws MessagingException {
-
+            @RequestParam("departmentId") Integer departmentId,
+            @RequestParam(value = "host", required = false) String host, // Optional parameter
+            @RequestParam(value = "port", required = false) Integer port, // Optional parameter
+            @RequestParam(value = "username", required = false) String username, // Optional parameter
+            @RequestParam(value = "password", required = false) String password // Optional parameter
+             ) throws MessagingException {
+            host = (host != null) ? host : defaultHost;
+            port = (port != null) ? port : defaultPort;
+            username = (username != null) ? username : defaultUsername;
+            password = (password != null) ? password : defaultPassword;
         try {
             // Create the local folder if it does not exist
             List<String> fileNames = new ArrayList<>();
@@ -183,7 +191,7 @@ public class EmailController {
             email.setDepartment(departmentId);
 
             // Call the service method to send the email
-            documentService.sendGroupDocument(email);
+            documentService.sendGroupDocument(email, host, port, username, password);
 
             return ResponseEntity.ok("Email sent and files uploaded successfully.");
         } catch (IOException e) {
@@ -206,8 +214,15 @@ public class EmailController {
             @RequestParam("cc") List<String> cc,
             @RequestParam("encoder") Integer encoder,
             @RequestParam("message") String message,
-            @RequestParam("departmentId") Integer departmentId) throws MessagingException {
-
+            @RequestParam("departmentId") Integer departmentId,
+            @RequestParam(value = "host", required = false) String host, // Optional parameter
+            @RequestParam(value = "port", required = false) Integer port, // Optional parameter
+            @RequestParam(value = "username", required = false) String username, // Optional parameter
+            @RequestParam(value = "password", required = false) String password) throws MessagingException {
+        host = (host != null) ? host : defaultHost;
+        port = (port != null) ? port : defaultPort;
+        username = (username != null) ? username : defaultUsername;
+        password = (password != null) ? password : defaultPassword;
         try {
             List<String> fileNames = new ArrayList<>();
             for (MultipartFile file : files) {
@@ -247,9 +262,10 @@ public class EmailController {
             email.setEncoder(encoder);
             email.setMessage(message);
             email.setDepartment(departmentId);
-
+            System.out.println(username);
+            System.out.println(password);
             // Call the service method to send the email
-            documentService.sendGroupDocument(email);
+            documentService.sendGroupDocument(email, host, port, username, password);
 
             return ResponseEntity.ok("Email sent and files uploaded successfully.");
         } catch (IOException e) {

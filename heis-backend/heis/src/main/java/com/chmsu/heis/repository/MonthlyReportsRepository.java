@@ -12,12 +12,19 @@ import java.util.List;
 public interface MonthlyReportsRepository extends JpaRepository<MonthlyReports,Long> {
 
     //Redo this tomorrow. May JOIN sa query
-    @Query(value = "SELECT document.from, document.department_id, document.attention, document.document_number, document.document_id, user.name, COUNT(document.document_id) AS doc_count " +
-            "FROM document " +
-            "INNER JOIN user ON user.user_id = document.from " +
-            "INNER JOIN department ON department.department_id = user.department_id " +
-            "WHERE YEAR(document.timestamp) = :year AND MONTH(document.timestamp) = :month " +
-            "GROUP BY document.from, document.attention", nativeQuery = true)
+    @Query(value = "SELECT \n" +
+            "    d.from,\n" +
+            "    d.department_id,\n" +
+            "    d.attention,\n" +
+            "    d.document_number,\n" +
+            "    d.document_id,\n" +
+            "    u.name,\n" +
+            "    COUNT(*) OVER (PARTITION BY d.attention) AS doc_count\n" +
+            "FROM document d\n" +
+            "INNER JOIN user u ON u.user_id = d.from \n" +
+            "INNER JOIN department dept ON dept.department_id = u.department_id \n" +
+            "WHERE YEAR(d.timestamp) = :year \n" +
+            "  AND MONTH(d.timestamp) = :month;\n", nativeQuery = true)
     List<Object[]> monthlyReport(@Param("month") String month,
                                  @Param("year") String year);
 

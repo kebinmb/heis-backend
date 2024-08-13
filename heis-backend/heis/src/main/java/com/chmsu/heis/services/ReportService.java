@@ -40,9 +40,11 @@ public class ReportService {
 
     public List<MonthlyReports> getMonthlyReports(String month, String year) {
         try {
+            // Fetch results from the repository
             List<Object[]> results = monthlyReportsRepository.monthlyReport(month, year);
             List<MonthlyReports> reports = new ArrayList<>();
 
+            // Iterate through results and map to MonthlyReports
             for (Object[] result : results) {
                 MonthlyReports report = new MonthlyReports();
                 report.setFrom((String) result[0]);
@@ -55,11 +57,15 @@ public class ReportService {
 
                 reports.add(report);
             }
+
+            // Return the list of reports
             return reports;
         } catch (Exception e) {
-            throw new RuntimeException("System encountered an exception", e);
+            // Handle exceptions and provide a meaningful message
+            throw new RuntimeException("System encountered an exception while fetching monthly reports", e);
         }
     }
+
 
     public List<ExternalReports> getExternalMonthlyReports(String externalMonth, String externalYear){
         try{
