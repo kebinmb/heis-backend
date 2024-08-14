@@ -62,7 +62,13 @@ public class EmailService {
         try {
             // Set basic email attributes
             helper.setFrom(username);
-            helper.setTo(email.getAttention());
+
+
+            List<String> toList = new ArrayList<>();
+            toList.add(email.getAttention());
+            toList.add(email.getThrough());
+            helper.setTo(toList.toArray(new String[0]));
+
             helper.setSubject(email.getSubject());
             helper.setText(htmlContent, true);
 

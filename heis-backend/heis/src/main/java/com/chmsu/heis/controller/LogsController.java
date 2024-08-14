@@ -22,6 +22,10 @@ public class LogsController {
                               @RequestParam Integer campus) {
         return logsService.getLogs(date, campus);
     }
+    @GetMapping("/documentLogsTalisayAccess")
+    public List<Logs> getLogsTalisayAccess(@RequestParam String date){
+        return logsService.getDocumentLogsTalisayAccess(date);
+    }
 
     @GetMapping("/documentLogs")
     public List<Logs> getDocumentLogs(@RequestParam String date, @RequestParam Integer campus){

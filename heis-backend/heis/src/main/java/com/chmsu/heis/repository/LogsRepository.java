@@ -40,6 +40,14 @@ public interface LogsRepository extends JpaRepository<Logs,Long> {
             "FROM logs " +
             "INNER JOIN user ON user.user_id = logs.user_id " +
             "WHERE DATE(logs.timestamp) = :date " +
+            "AND (message LIKE '%Processed document%')"+
+            "ORDER BY logs.timestamp;", nativeQuery = true)
+    List<Logs> getDocumentLogsTalisayAccess(@Param("date") String date);
+
+    @Query(value = "SELECT logs.* " +
+            "FROM logs " +
+            "INNER JOIN user ON user.user_id = logs.user_id " +
+            "WHERE DATE(logs.timestamp) = :date " +
             "AND user.campus = :campus " +
             "AND (message LIKE '%Added%' OR message LIKE '%Edited user details%' OR message LIKE '%updated information%' OR message LIKE '%created%' OR message LIKE '%deleted%')"+
             "ORDER BY logs.timestamp;", nativeQuery = true)

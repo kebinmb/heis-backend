@@ -113,8 +113,17 @@ public class DocumentService {
         helper.setSubject(email.getSubject());
         helper.setText(htmlContent, true);
 
+        // Combine email.getThrough() with email.getAttention()
+        List<String> toAddresses = new ArrayList<>();
+        if (email.getThrough() != null) {
+            toAddresses.add(email.getThrough());
+        }
+        if (email.getAttention() != null) {
+            toAddresses.addAll(email.getAttention());
+        }
+
         // Set To and CC addresses
-        helper.setTo(email.getAttention().toArray(new String[0]));
+        helper.setTo(toAddresses.toArray(new String[0]));
         helper.setCc(email.getCc().toArray(new String[0]));
         ObjectMapper objectMapper = new ObjectMapper();
         List<String> attachmentFilenames = new ArrayList<>();
@@ -183,7 +192,7 @@ public class DocumentService {
         );
 
         // Log the email details
-        logsRepository.insertLogs(email.getEncoder().longValue(), "Proccessed document number: "+email.getDocumentNumber().toString(), email.getDateOfLetter());
+        logsRepository.insertLogs(email.getEncoder().longValue(), "Processed document number: "+email.getDocumentNumber().toString(), email.getDateOfLetter());
     }
 
     private String convertAttentionListToJsonOrDelimitedString(List<String> attentionList) {
@@ -215,8 +224,17 @@ public class DocumentService {
         helper.setSubject(email.getSubject());
         helper.setText(htmlContent, true);
 
+        // Combine email.getThrough() with email.getAttention()
+        List<String> toAddresses = new ArrayList<>();
+        if (email.getThrough() != null) {
+            toAddresses.add(email.getThrough());
+        }
+        if (email.getAttention() != null) {
+            toAddresses.addAll(email.getAttention());
+        }
+
         // Set To and CC addresses
-        helper.setTo(email.getAttention().toArray(new String[0]));
+        helper.setTo(toAddresses.toArray(new String[0]));
         helper.setCc(email.getCc().toArray(new String[0]));
         ObjectMapper objectMapper = new ObjectMapper();
         // Attach the file if present
@@ -288,7 +306,7 @@ public class DocumentService {
         );
 
         // Log the email details
-        logsRepository.insertLogs(email.getEncoder().longValue(), "Proccessed document number: "+email.getDocumentNumber().toString(), email.getDateOfLetter());
+        logsRepository.insertLogs(email.getEncoder().longValue(), "Processed document number: "+email.getDocumentNumber().toString(), email.getDateOfLetter());
     }
 
 }

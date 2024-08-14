@@ -24,6 +24,9 @@ public class LogsService {
         System.out.println("Document Logs:"+logsRepository.getDocumentLogs(date,campus));
         return logsRepository.getDocumentLogs(date,campus);
     }
+    public List<Logs> getDocumentLogsTalisayAccess(String date){
+        return logsRepository.getDocumentLogsTalisayAccess(date);
+    }
 
     //User Maintenance Logs
     public List<Logs> getUserMaintenanceLogs(String date, Integer campus){

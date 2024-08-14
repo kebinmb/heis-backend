@@ -28,8 +28,8 @@ import java.util.UUID;
 @RequestMapping("/emails")
 public class EmailController {
 
-//    private static final String UPLOAD_DIR = "/Apache24/htdocs/heis/uploads";
-    private static final String UPLOAD_DIR = "/Users/kevin/Downloads";
+    private static final String UPLOAD_DIR = "/Apache24/htdocs/heis/uploads";
+//    private static final String UPLOAD_DIR = "/Users/kevin/Downloads";
 
     @Autowired
     private EmailService emailService;
