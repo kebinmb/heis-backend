@@ -54,10 +54,16 @@ public class EmailService {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true);
 
-        String htmlContent = "<html><body>" +
-                "<h2>Records Management System</h2>" +
+        String htmlContent = "<html>" +
+                "<head>" +
+                "<title>Records Management System</title>" +
+                "</head>" +
+                "<body>" +
+                "<header><h2>Records Management System</h2></header>" +
                 "<pre>" + email.getMessage() + "</pre>" +
-                "</body></html>";
+                "<footer>Footer</footer>" +
+                "</body>" +
+                "</html>";
 
         try {
             // Set basic email attributes
