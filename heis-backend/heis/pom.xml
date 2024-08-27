@@ -8,10 +8,12 @@
 		<version>3.3.1</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
+
 	<groupId>com.chmsu</groupId>
 	<artifactId>heis</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
-	<name>Records Document</name>
+	<packaging>war</packaging>
+	<version>0.0.1</version>
+	<name>recordssystem</name>
 	<description>RECORD DOCUMENT</description>
 	<properties>
 		<java.version>17</java.version>
@@ -22,9 +24,20 @@
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-tomcat</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-context</artifactId>
 			<version>4.1.2</version>
+		</dependency>
+		<dependency>
+			<groupId>jakarta.servlet</groupId>
+			<artifactId>jakarta.servlet-api</artifactId>
+			<version>5.0.0</version>
+			<scope>provided</scope>
 		</dependency>
 
 		<!-- Uncomment this if you need Spring Security -->

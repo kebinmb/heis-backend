@@ -34,6 +34,7 @@ public class ArchiveController {
     public ResponseEntity<List<Archive>> getAllDocuments() throws Exception {
         try{
             List<Archive> archives = archiveService.getAllDocuments();
+
             return ResponseEntity.ok(archives);
         }catch(Exception e){
             logger.error("Error occurred while fetching Archive details from controller", e);

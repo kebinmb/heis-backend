@@ -44,6 +44,10 @@ public class DocumentController {
         }
     }
 
+    @GetMapping("/hello")
+    public String hello(){
+        return "Hello";
+    }
 //    @PostMapping("/sgd")
 //    public ResponseEntity<DocumentGroup> sendGroupDocument(@RequestBody DocumentGroup documentGroup) {
 //       try{
